@@ -23,6 +23,14 @@ create index if not exists shared_playlists_members_idx
   on public.shared_playlists using gin (members);
 
 -- ---------------------------------------------------------------------
+-- 1b. Hak akses tabel (WAJIB)
+--     Project Supabase baru tidak lagi memberi hak otomatis ke role API.
+--     Tanpa ini muncul: "permission denied for table shared_playlists (42501)".
+-- ---------------------------------------------------------------------
+grant usage on schema public to anon, authenticated;
+grant select, insert, update, delete on public.shared_playlists to authenticated;
+
+-- ---------------------------------------------------------------------
 -- 2. Row Level Security
 --    Aplikasi memakai anon key, jadi RLS WAJIB aktif.
 -- ---------------------------------------------------------------------

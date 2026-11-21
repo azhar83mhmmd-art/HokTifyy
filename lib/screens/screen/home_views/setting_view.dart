@@ -325,7 +325,7 @@ class _ProfileSection extends StatelessWidget {
       stream: SupabaseAuthService.authStateChanges,
       builder: (context, snapshot) {
         final user = SupabaseAuthService.currentUser;
-        if (user != null) {
+        if (user != null && !user.isAnonymous) {
           final meta = user.userMetadata ?? {};
           final name = meta['full_name'] ?? user.email ?? 'HokTifyy User';
           final avatarUrl = meta['avatar_url'];

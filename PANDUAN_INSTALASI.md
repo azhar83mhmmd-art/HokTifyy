@@ -259,6 +259,7 @@ Pasang APK build lama, jalankan build baru sampai selesai, lalu buka kembali Hok
 | `gh auth login` tidak bisa buka browser | Normal di Termux: salin kode & buka `https://github.com/login/device` manual. |
 | Build terpotong saat Termux ditutup | Build tetap lanjut di GitHub. Jalankan `bash termux/install.sh USERNAME/HokTifyy` setelah selesai. |
 | Fitur login/playlist bersama error | Cek secret `SUPABASE_URL`/`SUPABASE_ANON_KEY` benar, `schema.sql` sudah di-Run, dan (untuk login) langkah 6. |
+| `permission denied for table shared_playlists` (42501) | Jalankan ulang `supabase/schema.sql` terbaru di SQL Editor (berisi `GRANT` untuk role `authenticated`). |
 | `Must be logged in` / `Login otomatis gagal` | Aktifkan *Allow anonymous sign-ins* (bagian 6.1) lalu coba lagi. Pastikan APK sudah dibuild dengan secret Supabase. |
 | Cek update tidak muncul | Repo harus **public**, build baru harus selesai dan terbit di Releases. Tag otomatis `v<versi>+<nomor run>`. |
 

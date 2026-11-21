@@ -211,7 +211,7 @@ class HomeSidebarDrawer extends StatelessWidget {
                 String subtitle = 'HokTifyy Music';
                 String? avatarUrl;
 
-                if (user != null) {
+                if (user != null && !user.isAnonymous) {
                   final meta = user.userMetadata ?? {};
                   displayName = meta['full_name'] ?? user.email?.split('@')[0] ?? 'User';
                   avatarUrl = meta['avatar_url'];
