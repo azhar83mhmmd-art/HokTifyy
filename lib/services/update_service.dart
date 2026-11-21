@@ -53,7 +53,9 @@ class UpdateService {
       }
 
       final packageInfo = await PackageInfo.fromPlatform();
-      final int currentBuild = int.tryParse(packageInfo.buildNumber) ?? 0;
+      // Pada APK per-ABI, Flutter menambah offset 1000/2000/4000 ke versionCode.
+      final int rawBuild = int.tryParse(packageInfo.buildNumber) ?? 0;
+      final int currentBuild = rawBuild > 1000 ? rawBuild % 1000 : rawBuild;
 
       if (serverBuild > currentBuild) {
         if (context.mounted) {
@@ -111,6 +113,10 @@ class UpdateService {
         ),
         actionsAlignment: MainAxisAlignment.spaceBetween,
         actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Nanti', style: TextStyle(color: Colors.grey)),
+          ),
           // Option 1: Open Official Web
           TextButton(
             onPressed: () async {
@@ -120,7 +126,7 @@ class UpdateService {
                 await launchUrl(uri, mode: LaunchMode.externalApplication);
               }
             },
-            child: const Text('Buka Web Resmi', style: TextStyle(color: Colors.grey)),
+            child: const Text('Web', style: TextStyle(color: Colors.grey)),
           ),
           // Option 2: Download inside application
           ElevatedButton(

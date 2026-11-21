@@ -9,6 +9,8 @@
 - Cek update memakai GitHub Releases repo sendiri.
 
 ### Added
+- Playlist bersama & Party otomatis memakai login anonim Supabase (tanpa wajib Google).
+- Pop-up update punya tombol "Nanti"; nomor build naik otomatis tiap build GitHub.
 - Workflow GitHub Actions untuk build APK dan skrip Termux (`termux/`) untuk setup, build, dan install.
 
 ---

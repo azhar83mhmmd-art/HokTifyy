@@ -17,11 +17,12 @@
 3. [Siapkan Termux](#3-siapkan-termux)
 4. [Setup sekali jalan](#4-setup-sekali-jalan-termuxsetupsh)
 5. [Build & install APK](#5-build--install-apk)
-6. [Login Google (opsional)](#6-login-google-opsional)
-7. [Update aplikasi](#7-update-aplikasi)
-8. [Cara manual (tanpa skrip)](#8-cara-manual-tanpa-skrip)
-9. [Masalah umum](#9-masalah-umum)
-10. [Lisensi](#10-lisensi)
+6. [Playlist bersama & Party (tanpa Google)](#6-playlist-bersama--party-tanpa-google)
+7. [Login Google (opsional)](#7-login-google-opsional)
+8. [Update aplikasi & pop-up pembaruan](#8-update-aplikasi--pop-up-pembaruan)
+9. [Cara manual (tanpa skrip)](#9-cara-manual-tanpa-skrip)
+10. [Masalah umum](#10-masalah-umum)
+11. [Lisensi](#11-lisensi)
 
 ---
 
@@ -143,9 +144,35 @@ atau buka tab **Releases** di repo dan unduh APK langsung dari browser:
 
 ---
 
-## 6. Login Google (opsional)
+## 6. Playlist bersama & Party (tanpa Google)
 
-Pemutar musik berjalan **tanpa login**. Login hanya dibutuhkan untuk *playlist bersama* dan *party room*.
+Fitur ini **tidak wajib login Google**. Saat kamu menekan *Buat playlist bersama* / *Party*, aplikasi otomatis masuk sebagai **pengguna anonim** lewat Supabase.
+
+### 6.1 Aktifkan sekali di Supabase
+1. Supabase Dashboard → **Authentication → Sign In / Providers** (di versi lama: *Providers*).
+2. Aktifkan **Allow anonymous sign-ins** → **Save**.
+3. Pastikan `supabase/schema.sql` sudah di-**Run** (bagian 2.2). Tanpa ini muncul error tabel `shared_playlists` tidak ditemukan.
+
+### 6.2 Cara memakai
+- **Membuat:** *Buat Playlist Baru* → isi nama → nyalakan saklar **"Jadikan Playlist Bersama"** → simpan. Aplikasi menampilkan **kode 6 karakter**; bagikan ke teman.
+- **Bergabung:** teman membuka menu gabung playlist bersama (*Join Shared Playlist*) dan memasukkan kodenya.
+- Lagu yang ditambahkan anggota muncul langsung di semua HP (Realtime).
+- **Party Room:** satu orang menekan buat room (host), yang lain gabung dengan kode; pemutaran disinkronkan.
+
+### 6.3 Batasan akun anonim
+- Identitas anonim tersimpan di HP. Jika aplikasi di-**uninstall** atau datanya dihapus, kamu dianggap pengguna baru: kepemilikan playlist lama hilang (anggota lain tetap aman, dan kamu bisa bergabung ulang memakai kode).
+- Ingin akun permanen? Login Google di bagian 7.
+
+### 6.4 Cek berhasil
+Supabase → **Table Editor → `shared_playlists`**: baris baru muncul setelah kamu membuat playlist bersama. Di **Authentication → Users** akan terlihat pengguna *Anonymous*.
+
+Jika muncul pesan *"Login otomatis gagal… anonymous sign-ins"* → langkah 6.1 belum diaktifkan.
+
+---
+
+## 7. Login Google (opsional)
+
+Pemutar musik dan playlist bersama berjalan **tanpa login Google** (lihat bagian 6). Login Google hanya untuk akun permanen yang tidak hilang saat aplikasi di-uninstall.
 
 1. **Google Cloud Console** → buat project → *APIs & Services → OAuth consent screen* (External).
 2. *Credentials → Create credentials → OAuth client ID*:
@@ -161,24 +188,48 @@ Pemutar musik berjalan **tanpa login**. Login hanya dibutuhkan untuk *playlist b
    gh secret set GOOGLE_WEB_CLIENT_ID -R USERNAME/HokTifyy -b "xxxx.apps.googleusercontent.com"
    ```
 5. Build ulang: `bash termux/build.sh`.
+6. Di aplikasi: **Pengaturan → Login Google**.
 
 ---
 
-## 7. Update aplikasi
+## 8. Update aplikasi & pop-up pembaruan
 
-1. Ubah versi di `pubspec.yaml`, mis. `version: 1.0.1+2` (angka setelah `+` **harus naik**).
-2. `bash termux/build.sh` — release baru bernama tag `v1.0.1+2`.
-3. Aplikasi yang sudah terpasang akan menampilkan dialog **Pembaruan tersedia** (cek update membaca release terbaru repo kamu).
+### Cara kerja
+1. Setiap build di GitHub otomatis memakai **nomor build yang naik sendiri** (nomor run) dan membuat release baru bertag `v<versi>+<nomor>`. Kamu **tidak perlu** mengedit `pubspec.yaml` untuk tiap build.
+2. Tiap kali HokTifyy dibuka, aplikasi mengecek release terbaru repo kamu.
+3. Jika ada yang lebih baru, muncul **pop-up "Pembaruan Tersedia"** berisi catatan perubahan dengan tombol:
+   - **Perbarui Langsung** → mengunduh APK di dalam aplikasi lalu membuka installer Android → tekan *Install*.
+   - **Web** → membuka halaman repo.
+   - **Nanti** → menutup pop-up (muncul lagi saat aplikasi dibuka berikutnya).
 
-Mengubah secret (mis. ganti project Supabase):
+> Android **tidak mengizinkan update benar-benar otomatis/senyap** untuk aplikasi di luar Play Store. Pop-up + satu ketukan *Install* adalah yang paling otomatis yang bisa dilakukan.
+
+### Syarat agar pop-up muncul
+- Repo **public** (aplikasi membaca GitHub tanpa login).
+- APK terpasang dibuild dari repo itu (build ini sudah membawa `HOKTIFYY_REPO` otomatis).
+- Build baru ditandatangani **keystore yang sama** (dibuat `setup.sh`), kalau tidak, installer menolak menimpa.
+- Release punya file `HokTifyy-android-universal.apk` (otomatis dibuat workflow).
+
+### Merilis update
 ```bash
-gh secret set SUPABASE_URL -R USERNAME/HokTifyy -b "https://yyyy.supabase.co"
+cd ~/hoktifyy
+# ... ubah kode / pengaturan ...
+bash termux/build.sh
+```
+Versi tampilan (mis. `1.0.0` → `1.1.0`) cukup diubah di `pubspec.yaml` bila mau; angka setelah `+` diabaikan karena diganti nomor run.
+
+Mengganti secret (mis. project Supabase baru):
+```bash
+gh secret set SUPABASE_URL -R $(cat ~/.hoktifyy_repo) -b "https://yyyy.supabase.co"
 bash termux/build.sh
 ```
 
+### Menguji pop-up
+Pasang APK build lama, jalankan build baru sampai selesai, lalu buka kembali HokTifyy di HP (pastikan internet aktif).
+
 ---
 
-## 8. Cara manual (tanpa skrip)
+## 9. Cara manual (tanpa skrip)
 
 1. Buat repo di github.com, upload seluruh isi folder.
 2. Repo → **Settings → Secrets and variables → Actions → New repository secret**:
@@ -197,7 +248,7 @@ bash termux/build.sh
 
 ---
 
-## 9. Masalah umum
+## 10. Masalah umum
 
 | Gejala | Solusi |
 |---|---|
@@ -208,10 +259,11 @@ bash termux/build.sh
 | `gh auth login` tidak bisa buka browser | Normal di Termux: salin kode & buka `https://github.com/login/device` manual. |
 | Build terpotong saat Termux ditutup | Build tetap lanjut di GitHub. Jalankan `bash termux/install.sh USERNAME/HokTifyy` setelah selesai. |
 | Fitur login/playlist bersama error | Cek secret `SUPABASE_URL`/`SUPABASE_ANON_KEY` benar, `schema.sql` sudah di-Run, dan (untuk login) langkah 6. |
-| Cek update tidak muncul | Repo harus **public**, tag harus berformat `v<versi>+<build>` dengan build lebih besar dari yang terpasang. |
+| `Must be logged in` / `Login otomatis gagal` | Aktifkan *Allow anonymous sign-ins* (bagian 6.1) lalu coba lagi. Pastikan APK sudah dibuild dengan secret Supabase. |
+| Cek update tidak muncul | Repo harus **public**, build baru harus selesai dan terbit di Releases. Tag otomatis `v<versi>+<nomor run>`. |
 
 ---
 
-## 10. Lisensi
+## 11. Lisensi
 
 HokTifyy adalah turunan **StreamBeats** (© 2026 DuskCipher) dengan source oleh **Valora Official**, berlisensi **GNU GPL v2 atau lebih baru**. Berkas [`LICENSE`](LICENSE) dan kredit Valora **tidak boleh dihapus**; rincian perubahan di [`NOTICE.md`](NOTICE.md). Jika membagikan APK ke orang lain, sediakan source code-nya (repo public sudah memenuhi).

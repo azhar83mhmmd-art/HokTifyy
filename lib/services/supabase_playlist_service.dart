@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
+import 'package:streambeats/services/supabase_auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:streambeats/core/models/exported.dart' hide MediaItem;
 import 'package:streambeats/services/db/db_provider.dart';
@@ -35,8 +36,7 @@ class SupabasePlaylistService {
   static Stream<void> get refreshStream => _refreshController.stream;
 
   static Future<String?> createSharedPlaylist(String title, List<Track> initialSongs) async {
-    final user = _supabase.auth.currentUser;
-    if (user == null) throw Exception('Must be logged in');
+    final user = await SupabaseAuthService.ensureSignedIn();
 
     final code = _generateCode();
     
@@ -59,8 +59,7 @@ class SupabasePlaylistService {
   }
 
   static Future<bool> joinPlaylist(String code) async {
-    final user = _supabase.auth.currentUser;
-    if (user == null) throw Exception('Must be logged in');
+    final user = await SupabaseAuthService.ensureSignedIn();
 
     try {
       final response = await _supabase.from(_table).select().eq('code', code).maybeSingle();

@@ -42,6 +42,28 @@ class SupabaseAuthService {
     }
   }
 
+  /// Pastikan ada sesi Supabase. Jika belum login, otomatis masuk sebagai
+  /// pengguna anonim supaya Playlist Bersama / Party langsung bisa dipakai.
+  /// (Butuh "Allow anonymous sign-ins" aktif di Supabase. Login Google tetap
+  /// tersedia di Pengaturan untuk akun permanen.)
+  static Future<User> ensureSignedIn() async {
+    final existing = _supabase.auth.currentUser;
+    if (existing != null) return existing;
+    if (!AppConfig.supabaseConfigured) {
+      throw Exception(
+          'Supabase belum dikonfigurasi (SUPABASE_URL / SUPABASE_ANON_KEY).');
+    }
+    try {
+      final res = await _supabase.auth.signInAnonymously();
+      final user = res.user ?? _supabase.auth.currentUser;
+      if (user == null) throw Exception('Login anonim gagal.');
+      return user;
+    } on AuthException catch (e) {
+      throw Exception(
+          'Login otomatis gagal: ${e.message}. Aktifkan "Allow anonymous sign-ins" di Supabase (Authentication > Sign In / Providers) atau login Google di Pengaturan.');
+    }
+  }
+
   static Future<void> signOut() async {
     try {
       await _ensureInitialized();

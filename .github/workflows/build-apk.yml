@@ -1,5 +1,10 @@
 name: "Build HokTifyy APK"
 
+# Cara pakai:
+#   - Manual : tab Actions -> "Build HokTifyy APK" -> Run workflow
+#   - Otomatis: push tag, mis. `git tag v1.0.0+1 && git push --tags`
+# Hasil: APK ada di tab Releases (dan di Artifacts).
+
 on:
   workflow_dispatch:
   push:
@@ -47,22 +52,32 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: '3.44.x'
+          flutter-version: '3.44.x'   # dikunci: stable terbaru (3.50) tidak cocok dengan AGP 8.9.1 project ini
           cache: true
 
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Read version from pubspec.yaml
+      - name: Tentukan versi & nomor build
         run: |
           full=$(grep -m1 '^version:' pubspec.yaml | awk '{print $2}')
-          echo "VERSION=${full%%+*}" >> "$GITHUB_ENV"
-          echo "BUILD=${full##*+}"   >> "$GITHUB_ENV"
+          VERSION="${full%%+*}"
           if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
-            echo "TAG=${GITHUB_REF_NAME}" >> "$GITHUB_ENV"
+            # tag berformat v1.2.3+45
+            t="${GITHUB_REF_NAME#v}"
+            VERSION="${t%%+*}"
+            BUILD="${t##*+}"
+            [ "$BUILD" = "$t" ] && BUILD="${GITHUB_RUN_NUMBER}"
+            TAG="${GITHUB_REF_NAME}"
           else
-            echo "TAG=v${full}" >> "$GITHUB_ENV"
+            # build manual: nomor build = nomor run (selalu naik -> pop-up update otomatis muncul)
+            BUILD="${GITHUB_RUN_NUMBER}"
+            TAG="v${VERSION}+${BUILD}"
           fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "BUILD=$BUILD"     >> "$GITHUB_ENV"
+          echo "TAG=$TAG"         >> "$GITHUB_ENV"
+          echo "Versi: $VERSION+$BUILD  tag: $TAG"
 
       - name: Setup signing keystore
         env:
@@ -72,11 +87,12 @@ jobs:
           KEY_ALIAS:       ${{ secrets.KEY_ALIAS }}
         run: |
           if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "Memakai keystore dari GitHub Secrets"
             echo "$KEYSTORE_BASE64" | base64 -d > android/hoktifyy.jks
             printf 'storePassword=%s\nkeyPassword=%s\nkeyAlias=%s\nstoreFile=hoktifyy.jks\n' \
               "$STORE_PASSWORD" "$KEY_PASSWORD" "$KEY_ALIAS" > android/key.properties
           else
-            echo "::warning::KEYSTORE_BASE64 belum diisi, memakai keystore sementara."
+            echo "::warning::KEYSTORE_BASE64 belum diisi. Membuat keystore SEMENTARA - APK tidak bisa di-update menimpa build sebelumnya. Jalankan termux/setup.sh agar keystore tetap."
             keytool -genkeypair -v -keystore android/hoktifyy.jks -keyalg RSA -keysize 2048 \
               -validity 10000 -alias hoktifyy -storepass hoktifyy-temp -keypass hoktifyy-temp \
               -dname "CN=HokTifyy, OU=Mobile, O=HokTifyy, C=ID"
@@ -90,6 +106,7 @@ jobs:
           GOOGLE_WEB_CLIENT_ID:  ${{ secrets.GOOGLE_WEB_CLIENT_ID }}
         run: |
           flutter build apk --release --android-skip-build-dependency-validation \
+            --build-name="$VERSION" --build-number="$BUILD" \
             --dart-define=SUPABASE_URL="$SUPABASE_URL" \
             --dart-define=SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY" \
             --dart-define=GOOGLE_WEB_CLIENT_ID="$GOOGLE_WEB_CLIENT_ID" \

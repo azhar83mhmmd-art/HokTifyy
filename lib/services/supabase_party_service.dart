@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:streambeats/services/supabase_auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:streambeats/core/models/exported.dart' hide MediaItem;
 
@@ -41,8 +42,7 @@ class SupabasePartyService {
   static Function(Duration)? onSeek;
 
   static Future<String?> createParty() async {
-    final user = _supabase.auth.currentUser;
-    if (user == null) throw Exception('Must be logged in');
+    final user = await SupabaseAuthService.ensureSignedIn();
 
     currentRoomCode = _generateCode();
     currentRole = PartyRole.host;
@@ -52,8 +52,7 @@ class SupabasePartyService {
   }
 
   static Future<bool> joinParty(String code) async {
-    final user = _supabase.auth.currentUser;
-    if (user == null) throw Exception('Must be logged in');
+    final user = await SupabaseAuthService.ensureSignedIn();
 
     currentRoomCode = code;
     currentRole = PartyRole.guest;
