@@ -1,3 +1,5 @@
+import 'package:streambeats/screens/screen/auth/login_screen.dart';
+import 'package:streambeats/services/login_gate_service.dart';
 import 'package:streambeats/core/config/app_config.dart';
 import 'dart:async';
 import 'dart:io' as io;
@@ -193,6 +195,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   bool _migrationPending = false;
   bool _onboardingPending = false;
+  bool _loginPending = false;
   bool _pluginBootstrapPending = false;
   bool _splashPending = io.Platform.isWindows;
 
@@ -207,6 +210,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     );
 
     _onboardingPending = !OnboardingService.onboardingDone;
+    _loginPending = LoginGateService.shouldShow;
     _pluginBootstrapPending = !PluginBootstrapService.bootstrapDone;
 
     if (io.Platform.isWindows) {
@@ -409,6 +413,15 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             _onboardingPending = false;
             _pluginBootstrapPending = !PluginBootstrapService.bootstrapDone;
           });
+        },
+      );
+    }
+
+    if (_loginPending) {
+      return LoginScreen(
+        onComplete: () {
+          if (!mounted) return;
+          setState(() => _loginPending = false);
         },
       );
     }

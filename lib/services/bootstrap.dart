@@ -1,3 +1,4 @@
+import 'package:streambeats/services/login_gate_service.dart';
 import 'dart:async';
 import 'dart:developer';
 
@@ -55,6 +56,7 @@ Future<void> bootstrapApp() async {
   try {
     final settingsDao = SettingsDAO(DBProvider.db);
     await OnboardingService.checkAndCacheDone(settingsDao);
+    await LoginGateService.checkAndCacheDone(settingsDao);
     await PluginBootstrapService.checkAndCacheDone(settingsDao);
   } catch (e) {
     log('Could not load bootstrap flag (will re-run bootstrap)',

@@ -42,6 +42,29 @@ class SupabaseAuthService {
     }
   }
 
+  /// Masuk dengan email + kata sandi.
+  static Future<AuthResponse> signInWithEmail(String email, String password) {
+    return _supabase.auth
+        .signInWithPassword(email: email.trim(), password: password);
+  }
+
+  /// Daftar dengan email + kata sandi. `session` pada hasilnya bernilai null
+  /// jika Supabase mewajibkan konfirmasi email.
+  static Future<AuthResponse> signUpWithEmail(String email, String password,
+      {String? name}) {
+    final n = name?.trim() ?? '';
+    return _supabase.auth.signUp(
+      email: email.trim(),
+      password: password,
+      data: n.isEmpty ? null : {'full_name': n},
+    );
+  }
+
+  /// Kirim tautan reset kata sandi ke email.
+  static Future<void> sendPasswordReset(String email) {
+    return _supabase.auth.resetPasswordForEmail(email.trim());
+  }
+
   /// Pastikan ada sesi Supabase. Jika belum login, otomatis masuk sebagai
   /// pengguna anonim supaya Playlist Bersama / Party langsung bisa dipakai.
   /// (Butuh "Allow anonymous sign-ins" aktif di Supabase. Login Google tetap

@@ -18,7 +18,7 @@
 4. [Setup sekali jalan](#4-setup-sekali-jalan-termuxsetupsh)
 5. [Build & install APK](#5-build--install-apk)
 6. [Playlist bersama & Party (tanpa Google)](#6-playlist-bersama--party-tanpa-google)
-7. [Login Google (opsional)](#7-login-google-opsional)
+7. [Layar login: email & Google](#7-layar-login-email--google)
 8. [Update aplikasi & pop-up pembaruan](#8-update-aplikasi--pop-up-pembaruan)
 9. [Cara manual (tanpa skrip)](#9-cara-manual-tanpa-skrip)
 10. [Masalah umum](#10-masalah-umum)
@@ -170,7 +170,19 @@ Jika muncul pesan *"Login otomatis gagal… anonymous sign-ins"* → langkah 6.1
 
 ---
 
-## 7. Login Google (opsional)
+## 7. Layar login: email & Google
+
+Saat HokTifyy dibuka **pertama kali** (setelah onboarding) muncul layar login dengan tiga pilihan:
+**Email + kata sandi**, **Google**, atau **Lanjutkan sebagai Tamu**. Layar ini tampil sekali; pilihan tamu atau login yang berhasil membuatnya tidak muncul lagi. Layar menyesuaikan ukuran: satu kolom di HP, dua panel di tablet/desktop. Layar ini otomatis dilewati jika `SUPABASE_URL` / `SUPABASE_ANON_KEY` belum diisi.
+
+### 7.1 Login email (tanpa setup tambahan)
+1. Supabase → **Authentication → Sign In / Providers → Email**: pastikan **Enable Email provider** aktif.
+2. **Confirm email** (pilih salah satu):
+   - **Nonaktif** → pendaftar langsung masuk (paling mudah untuk pemakaian pribadi).
+   - **Aktif** → pendaftar menerima email konfirmasi; setelah klik tautannya baru bisa masuk. Aplikasi menampilkan petunjuk ini otomatis.
+3. Fitur *Lupa kata sandi* mengirim tautan reset lewat email (butuh SMTP bawaan Supabase, terbatas beberapa email/jam; untuk pemakaian ramai, pasang SMTP sendiri di *Authentication → SMTP Settings*).
+
+### 7.2 Login Google (opsional)
 
 Pemutar musik dan playlist bersama berjalan **tanpa login Google** (lihat bagian 6). Login Google hanya untuk akun permanen yang tidak hilang saat aplikasi di-uninstall.
 
@@ -260,6 +272,7 @@ Pasang APK build lama, jalankan build baru sampai selesai, lalu buka kembali Hok
 | Build terpotong saat Termux ditutup | Build tetap lanjut di GitHub. Jalankan `bash termux/install.sh USERNAME/HokTifyy` setelah selesai. |
 | Fitur login/playlist bersama error | Cek secret `SUPABASE_URL`/`SUPABASE_ANON_KEY` benar, `schema.sql` sudah di-Run, dan (untuk login) langkah 6. |
 | `permission denied for table shared_playlists` (42501) | Jalankan ulang `supabase/schema.sql` terbaru di SQL Editor (berisi `GRANT` untuk role `authenticated`). |
+| `Email not confirmed` | *Confirm email* aktif di Supabase: buka tautan di email konfirmasi, atau nonaktifkan opsi itu (bagian 7.1). |
 | `Must be logged in` / `Login otomatis gagal` | Aktifkan *Allow anonymous sign-ins* (bagian 6.1) lalu coba lagi. Pastikan APK sudah dibuild dengan secret Supabase. |
 | Cek update tidak muncul | Repo harus **public**, build baru harus selesai dan terbit di Releases. Tag otomatis `v<versi>+<nomor run>`. |
 
