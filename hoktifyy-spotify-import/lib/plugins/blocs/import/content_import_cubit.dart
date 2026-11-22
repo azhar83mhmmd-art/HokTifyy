@@ -14,8 +14,14 @@ import 'package:streambeats/src/rust/api/plugin/commands.dart';
 import 'package:streambeats/src/rust/api/plugin/types.dart';
 import 'package:streambeats/src/rust/api/plugin/models.dart';
 
-const int _kResolutionConcurrency = 5;
+const int _kResolutionConcurrency = 8;
+// Update layar dibatasi supaya 500+ lagu tidak membuat UI patah-patah.
+const Duration _kEmitInterval = Duration(milliseconds: 300);
 const Duration _kPluginTimeout = Duration(seconds: 10);
+// Mengambil daftar lagu playlist besar (ratusan/ribuan lagu, berhalaman-halaman)
+// butuh waktu jauh lebih lama dari sekadar cek URL, jadi timeout-nya dipisah.
+const Duration _kFetchTracksTimeout = Duration(minutes: 5);
+const int _kFetchTracksMaxAttempts = 2;
 const double _kMinConfidence = 0.45;
 const int _kMaxCandidatesPerTrack = 5;
 
@@ -32,6 +38,19 @@ class ContentImportCubit extends Cubit<ContentImportState> {
   final PlaylistDAO _playlistDao;
 
   bool _cancelRequested = false;
+  DateTime _lastProgressEmit = DateTime.fromMillisecondsSinceEpoch(0);
+
+  void _emitProgress(List<ImportTrackEntry> tracks) {
+    final now = DateTime.now();
+    if (now.difference(_lastProgressEmit) < _kEmitInterval) return;
+    _lastProgressEmit = now;
+    final counts = _recount(tracks);
+    emit(state.copyWith(
+      tracks: List.unmodifiable(tracks),
+      resolvedCount: counts.resolved,
+      failedCount: counts.failed,
+    ));
+  }
 
   ContentImportCubit({
     PluginService? pluginService,
@@ -132,14 +151,26 @@ class ContentImportCubit extends Cubit<ContentImportState> {
 
   Future<void> _fetchTracks(String pluginId, String url) async {
     try {
-      final response = await _pluginService
-          .execute(
-            pluginId: pluginId,
-            request: PluginRequest.contentImporter(
-              ContentImporterCommand.getTracks(url: url),
-            ),
-          )
-          .timeout(_kPluginTimeout);
+      PluginResponse? response;
+      for (var attempt = 1; attempt <= _kFetchTracksMaxAttempts; attempt++) {
+        try {
+          response = await _pluginService
+              .execute(
+                pluginId: pluginId,
+                request: PluginRequest.contentImporter(
+                  ContentImporterCommand.getTracks(url: url),
+                ),
+              )
+              .timeout(_kFetchTracksTimeout);
+          break;
+        } on TimeoutException {
+          if (attempt >= _kFetchTracksMaxAttempts) rethrow;
+          log('getTracks timeout (percobaan $attempt), mengulang...',
+              name: 'ContentImportCubit');
+        }
+      }
+
+      if (isClosed || _cancelRequested) return;
 
       if (response is PluginResponse_ImportTracks) {
         final entries = response.field0
@@ -222,9 +253,7 @@ class ContentImportCubit extends Cubit<ContentImportState> {
     final entry = tracks[index];
 
     tracks[index] = entry.copyWith(status: TrackResolutionStatus.resolving);
-    if (!isClosed) {
-      emit(state.copyWith(tracks: List.unmodifiable(tracks)));
-    }
+    if (!isClosed) _emitProgress(tracks);
 
     try {
       final target = TrackMatchTarget.fromImport(
@@ -274,14 +303,7 @@ class ContentImportCubit extends Cubit<ContentImportState> {
       }
     }
 
-    if (!isClosed && !_cancelRequested) {
-      final counts = _recount(tracks);
-      emit(state.copyWith(
-        tracks: List.unmodifiable(tracks),
-        resolvedCount: counts.resolved,
-        failedCount: counts.failed,
-      ));
-    }
+    if (!isClosed && !_cancelRequested) _emitProgress(tracks);
   }
 
   /// Cocok otomatis hanya jika judul, artis, dan durasi sama-sama meyakinkan.

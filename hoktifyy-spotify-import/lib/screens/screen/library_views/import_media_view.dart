@@ -319,6 +319,12 @@ class _ImportMediaFromPlatformsViewState
       return;
     }
 
+    if (SpotifyImportService.looksLikeLink(input) &&
+        result.tracks.length >= 95) {
+      SnackbarService.showMessage(
+          'Link Spotify hanya terbaca ~100 lagu pertama. Untuk playlist 500 lagu, pakai import CSV (Exportify) atau tempel daftar lagu.');
+    }
+
     if (!context.mounted) return;
     var name = result.name?.trim() ?? '';
     if (name.isEmpty) {
@@ -395,7 +401,7 @@ class _ImportMediaFromPlatformsViewState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Tempel link playlist Spotify (harus publik, maks. sekitar 100 lagu), atau tempel daftar lagu: satu per baris dengan format "Artis - Judul".',
+                'Tempel link playlist Spotify (harus publik, hanya ~100 lagu pertama), atau tempel daftar lagu satu per baris "Artis - Judul" (bisa 500+ lagu). Untuk playlist besar, lebih mudah pakai file CSV dari Exportify.',
                 style: TextStyle(
                   color: Default_Theme.primaryColor2.withValues(alpha: 0.85),
                   fontSize: 13,
