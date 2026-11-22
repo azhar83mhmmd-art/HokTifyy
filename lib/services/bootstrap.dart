@@ -1,3 +1,4 @@
+import 'package:streambeats/services/library_sync_service.dart';
 import 'package:streambeats/services/login_gate_service.dart';
 import 'dart:async';
 import 'dart:developer';
@@ -23,6 +24,7 @@ Future<void> bootstrapApp() async {
   DBProvider.scheduleMaintenance();
 
   await ServiceLocator.setup();
+  LibrarySyncService.start();
 
   try {
     await PluginBootstrapService.ensureHostedRepositoriesPresent(

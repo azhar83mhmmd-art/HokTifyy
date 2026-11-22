@@ -15,7 +15,9 @@ import 'package:streambeats/src/rust/api/plugin/types.dart';
 import 'package:streambeats/src/rust/api/plugin/models.dart';
 
 const int _kResolutionConcurrency = 5;
-const Duration _kPluginTimeout = Duration(seconds: 10);
+const Duration _kPluginTimeout = Duration(seconds: 30);
+// Playlist besar (300+ lagu) butuh waktu lebih lama untuk diambil.
+const Duration _kTracksTimeout = Duration(minutes: 5);
 const double _kMinConfidence = 0.45;
 const int _kMaxCandidatesPerTrack = 5;
 
@@ -132,7 +134,7 @@ class ContentImportCubit extends Cubit<ContentImportState> {
               ContentImporterCommand.getTracks(url: url),
             ),
           )
-          .timeout(_kPluginTimeout);
+          .timeout(_kTracksTimeout);
 
       if (response is PluginResponse_ImportTracks) {
         final entries = response.field0
@@ -321,13 +323,18 @@ class ContentImportCubit extends Cubit<ContentImportState> {
       }
 
       var savedCount = 0;
+      final toSave = <Track>[];
       for (final entry in state.tracks) {
         final track = entry.effectiveTrack;
-        if (track != null) {
-          await _playlistDao.addTrackToPlaylist(playlistId, track);
-          savedCount++;
-        }
+        if (track != null) toSave.add(track);
       }
+      // Simpan per batch agar playlist besar tidak lambat / macet.
+      for (var i = 0; i < toSave.length; i += 100) {
+        final end = i + 100 > toSave.length ? toSave.length : i + 100;
+        await _playlistDao.addTracksToPlaylist(
+            playlistId, toSave.sublist(i, end));
+      }
+      savedCount = toSave.length;
 
       log('Saved $savedCount tracks to "$playlistName".',
           name: 'ContentImportCubit');

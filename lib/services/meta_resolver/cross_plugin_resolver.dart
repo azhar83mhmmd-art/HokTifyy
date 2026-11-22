@@ -37,6 +37,24 @@ final Map<String, List<RegExp>> _kVersionTagPatterns = {
   'extended': [RegExp(r'\bextended\b')],
   'unplugged': [RegExp(r'\bunplugged\b')],
   'stripped': [RegExp(r'\bstripped\b')],
+  'slowed': [RegExp(r'\bslowed\b')],
+  'sped': [
+    RegExp(r'\bsped up\b'),
+    RegExp(r'\bspeed up\b'),
+    RegExp(r'\bnightcore\b'),
+  ],
+  '8d': [RegExp(r'\b8d\b')],
+  'reverb': [RegExp(r'\breverb\b')],
+  'lofi': [RegExp(r'\blo ?fi\b')],
+  'bass': [RegExp(r'\bbass boosted\b')],
+  'tribute': [RegExp(r'\btribute\b')],
+};
+
+/// Versi yang mengubah lagu secara nyata: kalau muncul di kandidat tapi tidak
+/// ada di lagu sumber, kandidat dihukum jauh lebih berat.
+const Set<String> _kHeavyVersionTags = {
+  'slowed', 'sped', '8d', 'reverb', 'lofi', 'bass', 'karaoke',
+  'instrumental', 'cover', 'tribute', 'live', 'remix', 'acoustic',
 };
 
 class TrackMatchTarget {
@@ -476,8 +494,11 @@ class CrossPluginResolver {
     final ct = versionTags(joinNonEmpty([candidateTitle, candidateAlbum]));
     if (tt.isEmpty && ct.isEmpty) return 0;
     final missing = tt.difference(ct).length;
-    final extra = ct.difference(tt).length;
-    return (missing * 0.08 + extra * 0.04).clamp(0.0, 0.25);
+    final extraSet = ct.difference(tt);
+    final extraHeavy = extraSet.where(_kHeavyVersionTags.contains).length;
+    final extraLight = extraSet.length - extraHeavy;
+    return (missing * 0.08 + extraLight * 0.04 + extraHeavy * 0.15)
+        .clamp(0.0, 0.30);
   }
 
   String normalized(String? value) {

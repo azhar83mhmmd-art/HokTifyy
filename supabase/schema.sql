@@ -145,3 +145,23 @@ end $$;
 
 -- Catatan: fitur "Party Room" memakai Realtime *Broadcast* (channel party_<kode>),
 -- tidak butuh tabel. Pastikan Realtime aktif di Project Settings -> API.
+
+-- ---------------------------------------------------------------------
+-- 5. Cadangan library per akun (lagu disukai + playlist) -> tabel user_library
+--    Dipakai LibrarySyncService agar data tidak hilang saat login ulang /
+--    pasang ulang aplikasi. Aman dijalankan ulang.
+-- ---------------------------------------------------------------------
+create table if not exists public.user_library (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  data jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+alter table public.user_library enable row level security;
+
+drop policy if exists "user_library_own" on public.user_library;
+create policy "user_library_own" on public.user_library
+  for all to authenticated
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
+grant select, insert, update, delete on public.user_library to authenticated;

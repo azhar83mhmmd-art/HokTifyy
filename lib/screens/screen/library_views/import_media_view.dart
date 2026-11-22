@@ -8,6 +8,7 @@ import 'package:streambeats/plugins/blocs/plugin/plugin_state.dart';
 import 'package:streambeats/screens/widgets/snackbar.dart';
 import 'package:streambeats/services/import_export_service.dart';
 import 'package:streambeats/services/m3u_processor.dart';
+import 'package:streambeats/services/spotify_import_service.dart';
 import 'package:streambeats/src/rust/api/plugin/models.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -85,6 +86,18 @@ class _ImportMediaFromPlatformsViewState
                     btnName: AppLocalizations.of(context)!.importM3UFiles,
                     btnIcon: MingCute.playlist_2_line,
                     onClickFunc: () => _importM3UFile(context),
+                  ),
+                  const SizedBox(height: 10),
+                  _ImportFromBtn(
+                    btnName: 'Import dari Spotify (link atau teks)',
+                    btnIcon: Icons.link_rounded,
+                    onClickFunc: () => _importSpotify(context),
+                  ),
+                  const SizedBox(height: 10),
+                  _ImportFromBtn(
+                    btnName: 'Import dari file CSV Spotify (Exportify)',
+                    btnIcon: Icons.table_chart_rounded,
+                    onClickFunc: () => _importSpotifyCsv(context),
                   ),
                 ],
               );
@@ -281,6 +294,185 @@ class _ImportMediaFromPlatformsViewState
       RoutePaths.importProcess,
       queryParameters: {'pluginId': ''},
     );
+  }
+
+  // ------------------------------------------------------------ Spotify
+
+  Future<void> _importSpotify(BuildContext context) async {
+    final input = await _askSpotifyInput(context);
+    if (input == null || input.trim().isEmpty) return;
+
+    SnackbarService.showMessage(
+        SpotifyImportService.looksLikeLink(input)
+            ? 'Mengambil playlist Spotify...'
+            : 'Membaca daftar lagu...');
+
+    final SpotifyImportResult result;
+    try {
+      result = await SpotifyImportService.fromInput(input);
+    } on SpotifyImportException catch (e) {
+      SnackbarService.showMessage(e.message);
+      return;
+    } catch (e) {
+      log('Spotify import failed: $e', name: 'ImportSpotify');
+      SnackbarService.showMessage('Gagal membaca playlist: $e');
+      return;
+    }
+
+    if (SpotifyImportService.looksLikeLink(input) &&
+        result.tracks.length >= 95) {
+      SnackbarService.showMessage(
+          'Link Spotify hanya terbaca ~100 lagu pertama. Untuk playlist 500 lagu, pakai import CSV (Exportify) atau tempel daftar lagu.');
+    }
+
+    if (!context.mounted) return;
+    var name = result.name?.trim() ?? '';
+    if (name.isEmpty) {
+      final asked = await _askPlaylistName(context);
+      if (asked == null) return;
+      name = asked;
+    }
+    if (!context.mounted) return;
+    _startImport(context, name, result);
+  }
+
+  Future<void> _importSpotifyCsv(BuildContext context) async {
+    final picked = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: const ['csv'],
+    );
+    if (picked == null || picked.files.isEmpty) return;
+    final path = picked.files.first.path;
+    if (path == null) return;
+
+    final base = picked.files.first.name.replaceAll(RegExp(r'\.csv$', caseSensitive: false), '');
+    final SpotifyImportResult result;
+    try {
+      result = SpotifyImportService.fromCsv(
+        await File(path).readAsString(),
+        name: base,
+      );
+    } on SpotifyImportException catch (e) {
+      SnackbarService.showMessage(e.message);
+      return;
+    } catch (e) {
+      log('CSV import failed: $e', name: 'ImportSpotify');
+      SnackbarService.showMessage('File CSV tidak bisa dibaca.');
+      return;
+    }
+
+    if (!context.mounted) return;
+    _startImport(context, base.isEmpty ? 'Playlist Spotify' : base, result);
+  }
+
+  void _startImport(
+      BuildContext context, String name, SpotifyImportResult result) {
+    final summary = ImportCollectionSummary(
+      title: name,
+      kind: ImportCollectionType.playlist,
+      thumbnailUrl: result.thumbnailUrl,
+      trackCount: result.tracks.length,
+    );
+    context.read<ContentImportCubit>().loadFromM3U(result.tracks, summary);
+    context.goNamed(
+      RoutePaths.importProcess,
+      queryParameters: {'pluginId': ''},
+    );
+  }
+
+  Future<String?> _askSpotifyInput(BuildContext context) {
+    final controller = TextEditingController();
+    return showDialog<String>(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        backgroundColor: Default_Theme.themeColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
+        contentPadding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+        title: Text(
+          'Import dari Spotify',
+          style: Default_Theme.primaryTextStyle.merge(
+            const TextStyle(color: Default_Theme.primaryColor1, fontSize: 18),
+          ),
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Tempel link playlist Spotify (harus publik, hanya ~100 lagu pertama), atau tempel daftar lagu satu per baris "Artis - Judul" (bisa 500+ lagu). Untuk playlist besar, lebih mudah pakai file CSV dari Exportify.',
+                style: TextStyle(
+                  color: Default_Theme.primaryColor2.withValues(alpha: 0.85),
+                  fontSize: 13,
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: controller,
+                autofocus: true,
+                minLines: 3,
+                maxLines: 8,
+                cursorColor: Default_Theme.accentColor2,
+                style: const TextStyle(color: Colors.white, fontSize: 14),
+                decoration: InputDecoration(
+                  hintText: 'https://open.spotify.com/playlist/...',
+                  hintStyle: TextStyle(
+                    color: Default_Theme.primaryColor2.withValues(alpha: 0.5),
+                    fontSize: 14,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                        color:
+                            Default_Theme.primaryColor2.withValues(alpha: 0.3)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                        color: Default_Theme.accentColor2, width: 2),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogCtx).pop(),
+            child: Text(
+              AppLocalizations.of(context)!.buttonCancel,
+              style: TextStyle(color: Default_Theme.primaryColor2),
+            ),
+          ),
+          ValueListenableBuilder<TextEditingValue>(
+            valueListenable: controller,
+            builder: (_, val, __) => FilledButton(
+              onPressed: val.text.trim().isEmpty
+                  ? null
+                  : () => Navigator.of(dialogCtx).pop(val.text.trim()),
+              style: FilledButton.styleFrom(
+                backgroundColor: Default_Theme.accentColor2,
+                foregroundColor: Colors.black,
+                disabledBackgroundColor:
+                    Default_Theme.accentColor2.withValues(alpha: 0.4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                elevation: 0,
+              ),
+              child: const Text(
+                'Import',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ).whenComplete(controller.dispose);
   }
 
   Future<String?> _askPlaylistName(BuildContext context) {

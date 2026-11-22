@@ -53,8 +53,8 @@ class PlayerInitializer {
     final player = await AudioService.init(
       builder: () => StreamBeatsMusicPlayer(),
       config: const AudioServiceConfig(
-        androidNotificationChannelId: 'com.StreamBeatsPlayer.notification.status',
-        androidNotificationChannelName: 'BloomeTunes',
+        androidNotificationChannelId: 'com.hoktifyy.notification.status',
+        androidNotificationChannelName: 'HokTifyy',
         androidNotificationIcon: 'mipmap/ic_launcher',
         androidResumeOnClick: true,
         androidShowNotificationBadge: true,

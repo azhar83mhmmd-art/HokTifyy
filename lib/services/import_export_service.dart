@@ -25,6 +25,9 @@ class ImportExportService {
     return existing != null;
   }
 
+  static Map<String, dynamic> trackToMap(TrackDB t) => _trackDBToMap(t);
+  static Track trackFromMap(Map<String, dynamic> m) => _trackFromMap(m);
+
   static Map<String, dynamic> _trackDBToMap(TrackDB t) {
     return {
       'mediaId': t.mediaId,
@@ -167,7 +170,7 @@ class ImportExportService {
       };
 
       final path = await writeToJSON(
-          '${playlistDB.name}_StreamBeatsPlaylist.json', playlistMap,
+          '${playlistDB.name}_HokTifyyPlaylist.json', playlistMap,
           path: filePath);
       log("Playlist exported successfully", name: "FileManager");
       return path;
@@ -190,7 +193,7 @@ class ImportExportService {
       };
 
       final path =
-          await writeToJSON('${trackDB.title}_StreamBeatsSong.json', trackMap);
+          await writeToJSON('${trackDB.title}_HokTifyySong.json', trackMap);
       log("Track exported successfully", name: "FileManager");
       return path;
     } catch (e) {

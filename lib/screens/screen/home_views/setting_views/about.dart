@@ -152,7 +152,7 @@ class About extends StatelessWidget {
                         ),
                         const SizedBox(height: 6),
                         const Text(
-                          'SANN404GRUP',
+                          'SANN404GRUP & Azhar',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 20,
@@ -180,28 +180,12 @@ class About extends StatelessWidget {
                   const SizedBox(height: 12),
 
                   _buildLinkTile(
-                    icon: MingCute.telegram_fill,
-                    title: 'Telegram @Riz_buyX',
-                    subtitle: 'Hubungi kami di Telegram',
-                    onTap: () => _launchURL('https://t.me/Riz_buyX'),
-                  ),
-                  const SizedBox(height: 12),
-
-                  _buildLinkTile(
                     icon: MingCute.whatsapp_fill,
                     title: 'Saluran WhatsApp',
                     subtitle: 'Ikuti pembaruan di WhatsApp',
-                    onTap: () => _launchURL('https://whatsapp.com/channel/0029Vb8V2qh8V0tpL0VDky0M'),
+                    onTap: () => _launchURL('https://whatsapp.com/channel/0029Vb99yLaK0IBgYkp9KR2q'),
                   ),
-                  const SizedBox(height: 12),
 
-                  _buildLinkTile(
-                    icon: MingCute.store_2_fill,
-                    title: 'Valora Store',
-                    subtitle: 'Kunjungi toko resmi kami',
-                    onTap: () => _launchURL('https://valora-store.vercel.app/'),
-                  ),
-                  
                   const SizedBox(height: 40),
 
                   FutureBuilder<PackageInfo>(

@@ -61,3 +61,15 @@ _Riwayat di bawah ini berasal dari StreamBeats (proyek asal)._
 ### Fixed
 - Resolved issues with plugin-based streaming.
 - Addressed bugs related to imported provider playlists.
+
+## Patch 7
+- Sinkron otomatis lagu disukai + playlist (termasuk hasil impor) ke Supabase per akun (`user_library`); digabung saat login.
+- Keluar akun tidak menyentuh data lokal; layar login muncul lagi di pembukaan berikutnya (tidak perlu "hapus data aplikasi").
+
+## Patch 8
+- Ikon aplikasi baru (arch + play), latar #1B1A20.
+- Halaman Tentang: hapus Telegram & Valora Store, partner "SANN404GRUP & Azhar", link Saluran WhatsApp baru.
+- Sisa nama StreamBeats/BloomeTunes yang terlihat pengguna diganti HokTifyy (nama file ekspor, kanal notifikasi, Discord).
+
+## Patch 9
+- Impor playlist besar (300+ lagu) tidak lagi "Timed out fetching tracks" (timeout 10 dtk -> 5 menit), penyimpanan per batch.

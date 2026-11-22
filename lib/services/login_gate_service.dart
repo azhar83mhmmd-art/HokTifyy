@@ -25,4 +25,11 @@ class LoginGateService {
     await settingsDao.putSettingBool(_key, true);
     _done = true;
   }
+
+  /// Dipanggil saat keluar akun: layar login akan muncul lagi di pembukaan
+  /// berikutnya. TIDAK menyentuh data lokal (playlist, like, unduhan).
+  static Future<void> reset(SettingsDAO settingsDao) async {
+    await settingsDao.putSettingBool(_key, false);
+    _done = false;
+  }
 }

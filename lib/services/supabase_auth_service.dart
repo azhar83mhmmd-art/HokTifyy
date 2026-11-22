@@ -1,3 +1,7 @@
+import 'package:streambeats/services/library_sync_service.dart';
+import 'package:streambeats/services/login_gate_service.dart';
+import 'package:streambeats/services/db/db_provider.dart';
+import 'package:streambeats/services/db/dao/settings_dao.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:streambeats/core/config/app_config.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -90,8 +94,13 @@ class SupabaseAuthService {
   static Future<void> signOut() async {
     try {
       await _ensureInitialized();
+      // Dorong perubahan terakhir ke cloud sebelum sesi ditutup.
+      await LibrarySyncService.pushNow();
       await GoogleSignIn.instance.signOut();
       await _supabase.auth.signOut();
+      try {
+        await LoginGateService.reset(SettingsDAO(DBProvider.db));
+      } catch (_) {}
     } catch (e) {
       print('Sign out error: $e');
     }
