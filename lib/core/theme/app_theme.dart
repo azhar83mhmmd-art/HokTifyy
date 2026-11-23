@@ -1,29 +1,32 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static const primaryTextStyle = TextStyle(fontFamily: "Arial", color: Colors.white);
-  static const secondoryTextStyle = TextStyle(fontFamily: "Arial", color: Colors.white);
+  static const primaryTextStyle = TextStyle(fontFamily: "Inter", color: Colors.white);
+  static const secondoryTextStyle = TextStyle(fontFamily: "Inter", color: Colors.white);
   static const secondoryTextStyleMedium =
-      TextStyle(fontFamily: "Arial", fontWeight: FontWeight.w700, color: Colors.white);
-  static const tertiaryTextStyle = TextStyle(fontFamily: "Arial", color: Colors.white);
+      TextStyle(fontFamily: "Inter", fontWeight: FontWeight.w700, color: Colors.white);
+  static const tertiaryTextStyle = TextStyle(fontFamily: "Inter", color: Colors.white);
   static const fontAwesomeRegularFont =
       TextStyle(fontFamily: "FontAwesome-Regular");
   static const fontAwesomeSolidFont =
       TextStyle(fontFamily: "FontAwesome-Solids");
 
   // ---- Palet HokTifyy (violet, selaras dengan ikon) ----------------------
-  static const themeColor = Color(0xFF0A0A10);         // latar utama (hitam kebiruan)
+  static const themeColor = Color(0xFF0D0C12);         // latar utama (tonal gelap, gaya Sonara)
   static const primaryColor1 = Color(0xFFFFFFFF);      // putih (teks utama)
   static const primaryColor2 = Color(0xFFB9B9C9);      // teks sekunder
   static const accentColor1 = Color(0xFF8B5CF6);       // violet utama
   static const accentColor1light = Color(0xFFC4B5FD);  // violet muda
-  static const accentColor2 = Color(0xFFA78BFA);       // aksen terang (ikon/teks/tombol)
+  static const accentColor2 = Color(0xFFCFBCFF);       // aksen terang (ikon/teks/tombol)
+  // Token tonal Material 3 (Sonara): wadah aktif / pill navigasi
+  static const primaryContainerColor = Color(0xFF4F378B);
+  static const onPrimaryContainerColor = Color(0xFFEADDFF);
   static const successColor = Color(0xFF5EFF43);
 
   // token tambahan untuk komponen
-  static const surfaceColor = Color(0xFF14141D);       // kartu, dialog, sheet
-  static const surfaceHighColor = Color(0xFF1D1D29);   // snackbar, menu, chip
-  static const outlineColor = Color(0xFF2B2B3B);       // garis tipis
+  static const surfaceColor = Color(0xFF17161D);       // kartu, dialog, sheet
+  static const surfaceHighColor = Color(0xFF211F29);   // snackbar, menu, chip
+  static const outlineColor = Color(0x14FFFFFF);       // garis tipis
   static const brandGradient = LinearGradient(
     colors: [Color(0xFF7C3AED), Color(0xFFC084FC)],
     begin: Alignment.topLeft,
@@ -37,7 +40,7 @@ class AppTheme {
       surface: themeColor,
       surfaceContainerHighest: surfaceHighColor,
       outline: outlineColor,
-      onPrimary: Color(0xFF14082B), // teks gelap di atas tombol violet terang
+      onPrimary: Color(0xFF2E1A66), // teks gelap di atas tombol violet terang
       onSecondary: Colors.white,
       onSurface: Colors.white,  // Teks putih di atas background hitam
     );
@@ -47,7 +50,7 @@ class AppTheme {
       scaffoldBackgroundColor: themeColor,
       dialogBackgroundColor: surfaceColor,
       primaryColorDark: accentColor2,
-      fontFamily: 'Arial',
+      fontFamily: 'Inter',
       primarySwatch: MaterialColor(
         accentColor2.value,
         {
@@ -68,21 +71,21 @@ class AppTheme {
         secondary: accentColor1,
       ),
       textTheme: const TextTheme(
-        displayLarge: TextStyle(color: Colors.white, fontFamily: 'Arial'),
-        displayMedium: TextStyle(color: Colors.white, fontFamily: 'Arial'),
-        displaySmall: TextStyle(color: Colors.white, fontFamily: 'Arial'),
-        headlineLarge: TextStyle(color: Colors.white, fontFamily: 'Arial'),
-        headlineMedium: TextStyle(color: Colors.white, fontFamily: 'Arial'),
-        headlineSmall: TextStyle(color: Colors.white, fontFamily: 'Arial'),
-        titleLarge: TextStyle(color: Colors.white, fontFamily: 'Arial'),
-        titleMedium: TextStyle(color: Colors.white, fontFamily: 'Arial'),
-        titleSmall: TextStyle(color: Colors.white, fontFamily: 'Arial'),
-        bodyLarge: TextStyle(color: Colors.white, fontFamily: 'Arial'),
-        bodyMedium: TextStyle(color: Colors.white, fontFamily: 'Arial'),
-        bodySmall: TextStyle(color: Colors.white, fontFamily: 'Arial'),
-        labelLarge: TextStyle(color: Colors.white, fontFamily: 'Arial'),
-        labelMedium: TextStyle(color: Colors.white, fontFamily: 'Arial'),
-        labelSmall: TextStyle(color: Colors.white, fontFamily: 'Arial'),
+        displayLarge: TextStyle(color: Colors.white, fontFamily: 'Inter'),
+        displayMedium: TextStyle(color: Colors.white, fontFamily: 'Inter'),
+        displaySmall: TextStyle(color: Colors.white, fontFamily: 'Inter'),
+        headlineLarge: TextStyle(color: Colors.white, fontFamily: 'Inter'),
+        headlineMedium: TextStyle(color: Colors.white, fontFamily: 'Inter'),
+        headlineSmall: TextStyle(color: Colors.white, fontFamily: 'Inter'),
+        titleLarge: TextStyle(color: Colors.white, fontFamily: 'Inter'),
+        titleMedium: TextStyle(color: Colors.white, fontFamily: 'Inter'),
+        titleSmall: TextStyle(color: Colors.white, fontFamily: 'Inter'),
+        bodyLarge: TextStyle(color: Colors.white, fontFamily: 'Inter'),
+        bodyMedium: TextStyle(color: Colors.white, fontFamily: 'Inter'),
+        bodySmall: TextStyle(color: Colors.white, fontFamily: 'Inter'),
+        labelLarge: TextStyle(color: Colors.white, fontFamily: 'Inter'),
+        labelMedium: TextStyle(color: Colors.white, fontFamily: 'Inter'),
+        labelSmall: TextStyle(color: Colors.white, fontFamily: 'Inter'),
       ),
       iconTheme: const IconThemeData(color: primaryColor1),
       scrollbarTheme: ScrollbarThemeData(
@@ -208,6 +211,26 @@ class AppTheme {
         side: const BorderSide(color: outlineColor),
         labelStyle: const TextStyle(color: primaryColor1),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: surfaceColor,
+        indicatorColor: primaryContainerColor,
+        surfaceTintColor: Colors.transparent,
+        labelTextStyle: WidgetStateProperty.resolveWith((st) => TextStyle(
+              fontFamily: 'Inter',
+              fontSize: 12,
+              fontWeight: st.contains(WidgetState.selected)
+                  ? FontWeight.w700
+                  : FontWeight.w500,
+              color: st.contains(WidgetState.selected)
+                  ? Colors.white
+                  : primaryColor2,
+            )),
+      ),
+      listTileTheme: const ListTileThemeData(
+        contentPadding: EdgeInsets.symmetric(horizontal: 16),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(16))),
       ),
       dividerTheme: const DividerThemeData(color: outlineColor, thickness: 1),
     );

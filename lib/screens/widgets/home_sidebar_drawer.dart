@@ -237,11 +237,6 @@ class HomeSidebarDrawer extends StatelessWidget {
                                   fit: BoxFit.cover,
                                 ),
                         ),
-                        child: avatarUrl == null
-                            ? const Center(
-                                child: Icon(Icons.person, color: Colors.white24, size: 28),
-                              )
-                            : null,
                       ),
                       const SizedBox(width: 14),
                       // User Details

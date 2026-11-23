@@ -73,3 +73,7 @@ _Riwayat di bawah ini berasal dari StreamBeats (proyek asal)._
 
 ## Patch 9
 - Impor playlist besar (300+ lagu) tidak lagi "Timed out fetching tracks" (timeout 10 dtk -> 5 menit), penyimpanan per batch.
+
+## Patch 10
+- Tema bergaya Sonara/Material 3: palet tonal violet, font Inter, pill navigasi aktif, bottom bar kaca mengambang.
+- Logo aplikasi tetap memakai logo APK (busur + play) di semua tempat.

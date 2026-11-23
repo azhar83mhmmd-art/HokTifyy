@@ -131,6 +131,15 @@ flutter:
     - assets/repositories.json
     
   fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter/Inter-Regular.otf
+        - asset: assets/fonts/Inter/Inter-Medium.otf
+          weight: 500
+        - asset: assets/fonts/Inter/Inter-SemiBold.otf
+          weight: 600
+        - asset: assets/fonts/Inter/Inter-Bold.otf
+          weight: 700
     - family: Unageo
       fonts:
         - asset: assets/fonts/Unageo/Unageo-Regular.ttf

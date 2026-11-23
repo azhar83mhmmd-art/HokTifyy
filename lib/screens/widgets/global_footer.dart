@@ -1,4 +1,5 @@
 import 'dart:io' as io;
+import 'dart:ui' show ImageFilter;
 import 'package:streambeats/blocs/player_overlay/player_overlay_cubit.dart';
 import 'package:streambeats/screens/widgets/player_overlay_wrapper.dart';
 import 'package:streambeats/screens/widgets/mini_player_widget.dart';
@@ -219,9 +220,11 @@ class VerticalNavBar extends StatelessWidget {
       minWidth: 70,
       onDestinationSelected: navigationShell.goBranch,
       groupAlignment: 0.0,
+      selectedIconTheme: const IconThemeData(
+          color: Default_Theme.onPrimaryContainerColor),
       unselectedIconTheme:
           const IconThemeData(color: Default_Theme.primaryColor2),
-      indicatorColor: Default_Theme.accentColor2,
+      indicatorColor: Default_Theme.primaryContainerColor,
       indicatorShape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(15)),
       ),
@@ -236,70 +239,115 @@ class HorizontalNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final items = <(IconData, IconData, String)>[
+      (MingCute.home_4_line, MingCute.home_4_fill, l10n.navHome),
+      (MingCute.book_5_line, MingCute.book_5_fill, l10n.navLibrary),
+      (MingCute.search_2_line, MingCute.search_2_fill, l10n.navSearch),
+      (MingCute.music_2_line, MingCute.music_2_fill, l10n.navLocal),
+      (MingCute.folder_download_line, MingCute.folder_download_fill,
+          l10n.navOffline),
+    ];
 
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF0A0A0A),
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.35),
-            blurRadius: 20,
-            offset: const Offset(0, -4),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(28),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+          decoration: BoxDecoration(
+            color: Default_Theme.surfaceColor.withValues(alpha: 0.86),
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.45),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
-        ],
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.07),
-          width: 0.8,
+          child: Row(
+            children: [
+              for (var i = 0; i < items.length; i++)
+                Expanded(
+                  child: _NavItem(
+                    selected: navigationShell.currentIndex == i,
+                    icon: items[i].$1,
+                    activeIcon: items[i].$2,
+                    label: items[i].$3,
+                    onTap: () {
+                      HapticFeedback.selectionClick();
+                      navigationShell.goBranch(
+                        i,
+                        initialLocation: i == navigationShell.currentIndex,
+                      );
+                    },
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: BottomNavigationBar(
-          currentIndex: navigationShell.currentIndex,
-          onTap: navigationShell.goBranch,
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          type: BottomNavigationBarType.fixed,
-          selectedItemColor: Colors.white,
-          unselectedItemColor: Colors.white.withValues(alpha: 0.40),
-          selectedFontSize: 11,
-          unselectedFontSize: 11,
-          selectedLabelStyle: const TextStyle(
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.2,
+    );
+  }
+}
+
+class _NavItem extends StatelessWidget {
+  const _NavItem({
+    required this.selected,
+    required this.icon,
+    required this.activeIcon,
+    required this.label,
+    required this.onTap,
+  });
+  final bool selected;
+  final IconData icon;
+  final IconData activeIcon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkResponse(
+      onTap: onTap,
+      radius: 36,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 260),
+            curve: Curves.easeOutCubic,
+            width: selected ? 60 : 40,
+            height: 32,
+            decoration: BoxDecoration(
+              color: selected
+                  ? Default_Theme.primaryContainerColor
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Icon(
+              selected ? activeIcon : icon,
+              size: 22,
+              color: selected
+                  ? Default_Theme.onPrimaryContainerColor
+                  : Colors.white.withValues(alpha: 0.55),
+            ),
           ),
-          unselectedLabelStyle: const TextStyle(
-            fontWeight: FontWeight.w400,
+          const SizedBox(height: 4),
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 11,
+              height: 1.1,
+              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+              color: selected
+                  ? Colors.white
+                  : Colors.white.withValues(alpha: 0.55),
+            ),
           ),
-          items: [
-            BottomNavigationBarItem(
-              icon: const Icon(MingCute.home_4_line, size: 24),
-              activeIcon: const Icon(MingCute.home_4_fill, size: 24),
-              label: l10n.navHome,
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(MingCute.book_5_line, size: 24),
-              activeIcon: const Icon(MingCute.book_5_fill, size: 24),
-              label: l10n.navLibrary,
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(MingCute.search_2_line, size: 24),
-              activeIcon: const Icon(MingCute.search_2_fill, size: 24),
-              label: l10n.navSearch,
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(MingCute.music_2_line, size: 24),
-              activeIcon: const Icon(MingCute.music_2_fill, size: 24),
-              label: l10n.navLocal,
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(MingCute.folder_download_line, size: 24),
-              activeIcon: const Icon(MingCute.folder_download_fill, size: 24),
-              label: l10n.navOffline,
-            ),
-          ],
-        ),
+        ],
       ),
     );
   }
