@@ -45,8 +45,8 @@ class _SquareImgCardState extends State<SquareImgCard> {
 
   @override
   Widget build(BuildContext context) {
-    final double cardW = widget.isWide ? 240 : 130;
-    final double imageH = widget.isWide ? 130 : 130;
+    final double cardW = widget.isWide ? 280 : 156;
+    final double imageH = widget.isWide ? 156 : 156;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 6),
@@ -71,7 +71,7 @@ class _SquareImgCardState extends State<SquareImgCard> {
                 children: [
                   // Image container box
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(14),
                     child: SizedBox(
                       width: cardW,
                       height: imageH,

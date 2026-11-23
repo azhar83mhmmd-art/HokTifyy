@@ -1,3 +1,4 @@
+import 'package:streambeats/core/widgets/hok_signature.dart';
 import 'dart:io';
 import 'package:streambeats/screens/widgets/paging_scroll.dart';
 import 'package:flutter/material.dart';
@@ -59,7 +60,7 @@ class ColumnsCards extends StatelessWidget {
 
     final double itemWidth =
         ResponsiveBreakpoints.of(context).smallerOrEqualTo(TABLET)
-            ? (MediaQuery.of(context).size.width - 40) * 0.88
+            ? (MediaQuery.of(context).size.width - 28) * 0.88
             : (MediaQuery.of(context).size.width - 40) * 0.48;
 
     final List<Widget> cards = List.generate(
@@ -118,7 +119,7 @@ class TabSongListWidget extends StatelessWidget {
     final ScrollController scrollController = ScrollController();
     final double itemWidth =
         ResponsiveBreakpoints.of(context).smallerOrEqualTo(TABLET)
-            ? (MediaQuery.of(context).size.width - 40) * 0.88
+            ? (MediaQuery.of(context).size.width - 28) * 0.88
             : (MediaQuery.of(context).size.width - 40) * 0.48;
 
     return Column(
@@ -152,18 +153,14 @@ class TabSongListWidget extends StatelessWidget {
               ],
             ),
           ),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CategoryLabel(category: category),
-            Expanded(
-              child: ColumnsCards(
-                list: list,
-                columnSize: columnSize,
-                scrollController: scrollController, // Pass scrollController
-              ),
-            ),
-          ],
+        HokSectionHeader(title: category),
+        Padding(
+          padding: const EdgeInsets.only(left: 12),
+          child: ColumnsCards(
+            list: list,
+            columnSize: columnSize,
+            scrollController: scrollController,
+          ),
         ),
       ],
     );

@@ -77,3 +77,15 @@ _Riwayat di bawah ini berasal dari StreamBeats (proyek asal)._
 ## Patch 10
 - Tema bergaya Sonara/Material 3: palet tonal violet, font Inter, pill navigasi aktif, bottom bar kaca mengambang.
 - Logo aplikasi tetap memakai logo APK (busur + play) di semua tempat.
+
+## Patch 12
+- Beranda: header (tombol menu tonal, sapaan tanpa emoji, judul lebih besar), search bar pill + tombol filter tonal, kartu hero playlist pilihan (kaca, tombol "Putar sekarang" warna tonal, tanpa huruf kapital semua).
+
+## Patch 13
+- Ciri khas HokTifyy: motif lengkung (ArchGlyph) pada judul bagian, tombol "Lihat semua" berbentuk pil, ekualiser beranimasi untuk lagu yang sedang diputar, baris lagu aktif bertinta ungu, kartu lebih membulat; label vertikal diganti judul horizontal.
+
+## Patch 14
+- UI mengikuti Sonara lebih dekat: latar hitam murni, judul "Beranda" besar + avatar inisial, judul bagian tebal dengan panah, kartu hero editorial (label "Dengarkan sekarang"), cover persegi lebih besar bersudut 14, daftar lagu dengan garis tipis.
+
+## Patch 15
+- Logo/ikon aplikasi diganti: not musik + tombol play + gelombang suara (putih di latar hitam).

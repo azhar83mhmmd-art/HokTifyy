@@ -1,3 +1,4 @@
+import 'package:streambeats/core/widgets/hok_signature.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -67,14 +68,20 @@ class SongCardWidget extends StatelessWidget {
           margin: const EdgeInsets.symmetric(vertical: 2),
           decoration: BoxDecoration(
             color: isPlaying
-                ? Default_Theme.accentColor2.withValues(alpha: 0.08)
+                ? Default_Theme.primaryContainerColor.withValues(alpha: 0.55)
                 : Colors.transparent,
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(18),
+            border: isPlaying
+                ? Border.all(
+                    color: Default_Theme.accentColor2.withValues(alpha: 0.35))
+                : Border(
+                    bottom: BorderSide(
+                        color: Colors.white.withValues(alpha: 0.07))),
           ),
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(18),
               splashColor: Default_Theme.primaryColor1.withValues(alpha: 0.06),
               highlightColor:
                   Default_Theme.primaryColor1.withValues(alpha: 0.03),
@@ -100,10 +107,8 @@ class SongCardWidget extends StatelessWidget {
                                   scale: animation, child: child),
                             ),
                             child: isPlaying
-                                ? const Icon(
-                                    MingCute.right_fill,
+                                ? const EqualizerBars(
                                     key: ValueKey('playing_icon'),
-                                    color: Default_Theme.accentColor2,
                                     size: 18,
                                   )
                                 : Text(
@@ -121,7 +126,7 @@ class SongCardWidget extends StatelessWidget {
                       ),
 
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(14),
                       child: SizedBox(
                         width: isWide ? 86 : 50,
                         height: 50,

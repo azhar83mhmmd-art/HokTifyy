@@ -16,150 +16,104 @@ class ChartWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = ResponsiveBreakpoints.of(context).isMobile;
     final artwork = chart.thumbnail;
     final thumbnailUrl = artwork?.urlHigh ?? artwork?.url ?? artwork?.urlLow;
 
-    final double cardHeight = isMobile
-        ? MediaQuery.of(context).size.height * 0.28
-        : 220;
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: SizedBox(
-        height: cardHeight,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            // Background image
-            if (thumbnailUrl != null && thumbnailUrl.isNotEmpty)
-              LoadImageCached(
-                imageUrl: thumbnailUrl,
-                fallbackUrl: artwork?.url ?? thumbnailUrl,
-                fit: BoxFit.cover,
-              )
-            else
-              const _ChartPlaceholder(),
-
-            // Full gradient overlay (dark at bottom)
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.black.withValues(alpha: 0.15),
-                      Colors.black.withValues(alpha: 0.35),
-                      Colors.black.withValues(alpha: 0.82),
-                    ],
-                    stops: const [0.0, 0.45, 1.0],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Teks editorial di atas kartu
+        Text(
+          'DENGARKAN SEKARANG',
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.4,
+            color: Colors.white.withValues(alpha: 0.55),
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          chart.title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.5,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Expanded(
+          child: ClipRRect(
+          borderRadius: BorderRadius.circular(22),
+          child: SizedBox(
+            width: double.infinity,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                if (thumbnailUrl != null && thumbnailUrl.isNotEmpty)
+                  LoadImageCached(
+                    imageUrl: thumbnailUrl,
+                    fallbackUrl: artwork?.url ?? thumbnailUrl,
+                    fit: BoxFit.cover,
+                  )
+                else
+                  const _ChartPlaceholder(),
+                Positioned.fill(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withValues(alpha: 0.78),
+                        ],
+                        stops: const [0.45, 1.0],
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-
-            // Top-left: "PLAYLIST PILIHAN" badge
-            Positioned(
-              top: 16,
-              left: 16,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.55),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.25),
-                    width: 0.8,
-                  ),
-                ),
-                child: const Text(
-                  'PLAYLIST PILIHAN',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.8,
-                  ),
-                ),
-              ),
-            ),
-
-            // Bottom: title + play button
-            Positioned(
-              left: 16,
-              right: 16,
-              bottom: 14,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Title
-                  Text(
-                    chart.title,
+                Positioned(
+                  left: 18,
+                  right: 74,
+                  bottom: 16,
+                  child: Text(
+                    (chart.description != null && chart.description!.isNotEmpty)
+                        ? chart.description!
+                        : chart.title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.4,
-                      height: 1.2,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      height: 1.25,
                     ),
                   ),
-                  if (chart.description != null && chart.description!.isNotEmpty) ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      chart.description!,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.75),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400,
-                      ),
+                ),
+                Positioned(
+                  right: 14,
+                  bottom: 14,
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFCFBCFF),
+                      shape: BoxShape.circle,
                     ),
-                  ],
-                  const SizedBox(height: 12),
-                  // PUTAR SEKARANG button
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              MingCute.play_fill,
-                              size: 16,
-                              color: Colors.black,
-                            ),
-                            SizedBox(width: 6),
-                            Text(
-                              'PUTAR SEKARANG',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                    child: const Icon(MingCute.play_fill,
+                        size: 22, color: Color(0xFF2E1A66)),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
-      ),
+        ),
+      ],
     );
   }
 }

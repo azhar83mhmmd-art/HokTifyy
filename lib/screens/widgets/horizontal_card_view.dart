@@ -1,3 +1,4 @@
+import 'package:streambeats/core/widgets/hok_signature.dart';
 import 'dart:io';
 import 'package:streambeats/blocs/media_player/streambeats_player_cubit.dart';
 import 'package:streambeats/core/models/exported.dart';
@@ -102,37 +103,9 @@ class _HorizontalCardViewState extends State<HorizontalCardView> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Section header: title + "Lihat semua"
-          Padding(
-            padding: const EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 4),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  widget.section.title,
-                  textAlign: TextAlign.start,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                    letterSpacing: -0.2,
-                  ).merge(Default_Theme.secondoryTextStyle),
-                ),
-                if (widget.canLoadMore)
-                  GestureDetector(
-                    onTap: widget.onLoadMore,
-                    child: Text(
-                      'Lihat semua',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white.withValues(alpha: 0.55),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
+          HokSectionHeader(
+            title: widget.section.title,
+            onSeeAll: widget.canLoadMore ? widget.onLoadMore : null,
           ),
           SizedBox(
             height: 190,

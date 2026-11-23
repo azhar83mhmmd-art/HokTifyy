@@ -12,7 +12,7 @@ class AppTheme {
       TextStyle(fontFamily: "FontAwesome-Solids");
 
   // ---- Palet HokTifyy (violet, selaras dengan ikon) ----------------------
-  static const themeColor = Color(0xFF0D0C12);         // latar utama (tonal gelap, gaya Sonara)
+  static const themeColor = Color(0xFF000000);         // latar utama (tonal gelap, gaya Sonara)
   static const primaryColor1 = Color(0xFFFFFFFF);      // putih (teks utama)
   static const primaryColor2 = Color(0xFFB9B9C9);      // teks sekunder
   static const accentColor1 = Color(0xFF8B5CF6);       // violet utama
@@ -24,8 +24,8 @@ class AppTheme {
   static const successColor = Color(0xFF5EFF43);
 
   // token tambahan untuk komponen
-  static const surfaceColor = Color(0xFF17161D);       // kartu, dialog, sheet
-  static const surfaceHighColor = Color(0xFF211F29);   // snackbar, menu, chip
+  static const surfaceColor = Color(0xFF111115);       // kartu, dialog, sheet
+  static const surfaceHighColor = Color(0xFF1C1C22);   // snackbar, menu, chip
   static const outlineColor = Color(0x14FFFFFF);       // garis tipis
   static const brandGradient = LinearGradient(
     colors: [Color(0xFF7C3AED), Color(0xFFC084FC)],

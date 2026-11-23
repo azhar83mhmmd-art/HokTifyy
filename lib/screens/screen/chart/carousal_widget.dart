@@ -141,8 +141,8 @@ class _CaraouselWidgetState extends State<CaraouselWidget> {
                             },
                             options: CarouselOptions(
                               height: ResponsiveBreakpoints.of(context).isMobile
-                                  ? MediaQuery.of(context).size.height * 0.28
-                                  : 220,
+                                  ? MediaQuery.of(context).size.height * 0.37
+                                  : 300,
                               viewportFraction: 1.0,
                               autoPlay: autoPlay,
                               autoPlayInterval:

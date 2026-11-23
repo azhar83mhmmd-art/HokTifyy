@@ -457,10 +457,10 @@ class CustomDiscoverBar extends StatelessWidget {
 
   String _getGreeting() {
     final hour = DateTime.now().hour;
-    if (hour < 12) return 'Selamat Pagi \u2600\uFE0F';
-    if (hour < 15) return 'Selamat Siang \uD83C\uDF24\uFE0F';
-    if (hour < 18) return 'Selamat Sore \uD83C\uDF05';
-    return 'Selamat Malam \uD83C\uDF19';
+    if (hour < 12) return 'Selamat Pagi';
+    if (hour < 15) return 'Selamat Siang';
+    if (hour < 18) return 'Selamat Sore';
+    return 'Selamat Malam';
   }
 
   @override
@@ -472,68 +472,65 @@ class CustomDiscoverBar extends StatelessWidget {
       surfaceTintColor: Default_Theme.themeColor,
       backgroundColor: Default_Theme.themeColor,
       automaticallyImplyLeading: false,
-      toolbarHeight: 68,
+      toolbarHeight: 76,
       bottom: const _HomeSearchBar(),
+      titleSpacing: 20,
       title: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Hamburger → Sidebar Drawer
-          IconButton(
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-            onPressed: () {
-              GlobalFooter.scaffoldKey.currentState?.openDrawer();
-            },
-            icon: const Icon(
-              MingCute.menu_line,
-              color: Default_Theme.primaryColor1,
-              size: 26,
+          const Expanded(
+            child: Text(
+              'Beranda',
+              style: TextStyle(
+                fontSize: 36,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -1,
+                color: Colors.white,
+              ),
             ),
           ),
-          const SizedBox(width: 12),
-          // Greeting + Account Name / App Name
-          Expanded(
-            child: StreamBuilder<AuthState>(
-              stream: SupabaseAuthService.authStateChanges,
-              builder: (context, snapshot) {
-                final user = SupabaseAuthService.currentUser;
-                String displayName = 'HokTifyy';
-                if (user != null && !user.isAnonymous) {
-                  final meta = user.userMetadata ?? {};
-                  displayName = meta['full_name'] ?? user.email?.split('@')[0] ?? 'User';
-                }
-
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      _getGreeting(),
-                      style: Default_Theme.primaryTextStyle.merge(
-                        const TextStyle(
-                          fontSize: 12,
-                          color: Default_Theme.primaryColor2,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      displayName,
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Default_Theme.primaryColor1,
-                        letterSpacing: -0.3,
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
-          // Right icons: Timer + Notification
           const TimerIcon(),
           const NotificationIcon(),
+          const SizedBox(width: 6),
+          // Avatar → Sidebar Drawer
+          StreamBuilder<AuthState>(
+            stream: SupabaseAuthService.authStateChanges,
+            builder: (context, snapshot) {
+              final user = SupabaseAuthService.currentUser;
+              String initials = 'HT';
+              if (user != null && !user.isAnonymous) {
+                final meta = user.userMetadata ?? {};
+                final name = (meta['full_name'] ?? user.email ?? 'U').toString();
+                final parts =
+                    name.split(RegExp(r'[\s@._-]+')).where((e) => e.isNotEmpty);
+                initials = parts.take(2).map((e) => e[0].toUpperCase()).join();
+                if (initials.isEmpty) initials = 'U';
+              }
+              return GestureDetector(
+                onTap: () =>
+                    GlobalFooter.scaffoldKey.currentState?.openDrawer(),
+                child: Container(
+                  width: 44,
+                  height: 44,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Default_Theme.primaryContainerColor,
+                    border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.18), width: 1.5),
+                  ),
+                  child: Text(
+                    initials,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: Default_Theme.onPrimaryContainerColor,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
         ],
       ),
     );
@@ -545,7 +542,7 @@ class _HomeSearchBar extends StatelessWidget implements PreferredSizeWidget {
   const _HomeSearchBar();
 
   @override
-  Size get preferredSize => const Size.fromHeight(60);
+  Size get preferredSize => const Size.fromHeight(64);
 
   @override
   Widget build(BuildContext context) {
@@ -560,10 +557,12 @@ class _HomeSearchBar extends StatelessWidget implements PreferredSizeWidget {
                 context.go('/Search');
               },
               child: Container(
-                height: 48,
+                height: 52,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1A1A1A),
-                  borderRadius: BorderRadius.circular(14),
+                  color: Default_Theme.surfaceHighColor,
+                  borderRadius: BorderRadius.circular(26),
+                  border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.08)),
                 ),
                 child: Row(
                   children: [
@@ -591,16 +590,16 @@ class _HomeSearchBar extends StatelessWidget implements PreferredSizeWidget {
           const SizedBox(width: 10),
           // Filter icon
           Container(
-            height: 48,
-            width: 48,
-            decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A),
-              borderRadius: BorderRadius.circular(14),
+            height: 52,
+            width: 52,
+            decoration: const BoxDecoration(
+              color: Default_Theme.primaryContainerColor,
+              shape: BoxShape.circle,
             ),
             child: const Icon(
               MingCute.filter_line,
-              color: Default_Theme.primaryColor1,
-              size: 20,
+              color: Default_Theme.onPrimaryContainerColor,
+              size: 22,
             ),
           ),
         ],
