@@ -1,6 +1,6 @@
 #!/data/data/com.termux/files/usr/bin/bash
 # =====================================================================
-#  HokTifyy - setup sekali jalan di Termux
+#  Vynora Music - setup sekali jalan di Termux
 #  - memasang tool yang dibutuhkan
 #  - login GitHub, membuat repo, mengunggah source
 #  - mengisi GitHub Secrets (Supabase, Google, keystore)
@@ -30,13 +30,13 @@ GH_USER="$(gh api user -q .login)"
 echo "Login sebagai: $GH_USER"
 
 say "3/6 Membuat repo GitHub dan mengunggah source"
-REPO_NAME="$(ask 'Nama repo' 'HokTifyy')"
+REPO_NAME="$(ask 'Nama repo' 'Vynora Music')"
 VIS="$(ask 'Visibilitas repo (public/private). Public disarankan (lisensi GPL + fitur update-in-app)' 'public')"
 [ -d .git ] || git init -b main
 git config user.name  >/dev/null 2>&1 || git config user.name  "$GH_USER"
 git config user.email >/dev/null 2>&1 || git config user.email "${GH_USER}@users.noreply.github.com"
 git add -A
-git commit -m "HokTifyy: initial import (based on StreamBeats, source by Valora Official)" || true
+git commit -m "Vynora Music: initial import (based on StreamBeats, source by Valora Official)" || true
 if gh repo view "$GH_USER/$REPO_NAME" >/dev/null 2>&1; then
   warn "Repo $GH_USER/$REPO_NAME sudah ada, hanya push."
   git remote get-url origin >/dev/null 2>&1 || git remote add origin "https://github.com/$GH_USER/$REPO_NAME.git"
@@ -68,7 +68,7 @@ else
   KEY_ALIAS="hoktifyy"
   keytool -genkeypair -keystore "$KS" -alias "$KEY_ALIAS" -keyalg RSA -keysize 2048 -validity 10000 \
     -storepass "$STORE_PASSWORD" -keypass "$STORE_PASSWORD" \
-    -dname "CN=HokTifyy, OU=Mobile, O=HokTifyy, C=ID"
+    -dname "CN=Vynora Music, OU=Mobile, O=Vynora Music, C=ID"
   printf 'STORE_PASSWORD=%s\nKEY_ALIAS=%s\n' "$STORE_PASSWORD" "$KEY_ALIAS" > "$KS_DIR/credentials.txt"
   chmod 600 "$KS" "$KS_DIR/credentials.txt"
   warn "BACKUP folder $KS_DIR. Kalau keystore hilang, update APK akan gagal (harus uninstall dulu)."

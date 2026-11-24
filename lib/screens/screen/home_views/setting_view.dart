@@ -327,7 +327,7 @@ class _ProfileSection extends StatelessWidget {
         final user = SupabaseAuthService.currentUser;
         if (user != null && !user.isAnonymous) {
           final meta = user.userMetadata ?? {};
-          final name = meta['full_name'] ?? user.email ?? 'HokTifyy User';
+          final name = meta['full_name'] ?? user.email ?? 'Vynora Music User';
           final avatarUrl = meta['avatar_url'];
 
           return _SettingsSection(

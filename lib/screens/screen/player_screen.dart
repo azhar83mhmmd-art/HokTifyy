@@ -367,7 +367,7 @@ class _RoundIconButton extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Sampul + lengkung gelombang suara (ciri khas HokTifyy)
+// Sampul + lengkung gelombang suara (ciri khas Vynora Music)
 // ---------------------------------------------------------------------------
 
 class CoverImageVolSlider extends StatelessWidget {

@@ -53,6 +53,7 @@ import 'package:streambeats/blocs/add_to_playlist/cubit/add_to_playlist_cubit.da
 import 'package:streambeats/blocs/library/cubit/library_items_cubit.dart';
 import 'package:streambeats/plugins/blocs/import/content_import_cubit.dart';
 import 'package:streambeats/routes/app_router.dart';
+import 'package:streambeats/services/update_service.dart';
 import 'package:streambeats/screens/screen/library_views/cubit/current_playlist_cubit.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:share_handler/share_handler.dart';
@@ -163,7 +164,7 @@ Future<void> main() async {
   // Supabase diisi lewat --dart-define (lihat lib/core/config/app_config.dart).
   // Jika belum diisi, app tetap jalan sebagai pemutar musik lokal.
   if (!AppConfig.supabaseConfigured) {
-    debugPrint('[HokTifyy] SUPABASE_URL / SUPABASE_ANON_KEY belum diisi - '
+    debugPrint('[Vynora Music] SUPABASE_URL / SUPABASE_ANON_KEY belum diisi - '
         'fitur cloud (login, playlist bersama, party) tidak aktif.');
   }
   await Supabase.initialize(
@@ -246,6 +247,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       unawaited(_ensurePlayerHealthyOnResume());
       unawaited(_checkPluginUpdatesOnResume());
+      unawaited(UpdateService.checkUpdate());
       unawaited(SupabasePartyService.reconnectIfNecessary());
     }
   }

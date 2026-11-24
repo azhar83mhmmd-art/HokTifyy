@@ -1,6 +1,6 @@
 {
   "@@locale": "id",
-  "onboardingTitle": "Selamat Datang di HokTifyy",
+  "onboardingTitle": "Selamat Datang di Vynora Music",
   "onboardingSubtitle": "Mari atur bahasa dan wilayah Anda.",
   "continueButton": "Lanjutkan",
   "navHome": "Beranda",
@@ -481,10 +481,10 @@
   "storageAutoBackupSubtitle": "Buat cadangan data Anda secara berkala secara otomatis.",
   "storageAutoLyrics": "Simpan Lirik Otomatis",
   "storageAutoLyricsSubtitle": "Simpan lirik secara otomatis saat lagu diputar.",
-  "storageResetApp": "Reset Aplikasi HokTifyy",
+  "storageResetApp": "Reset Aplikasi Vynora Music",
   "storageResetAppSubtitle": "Hapus semua data dan kembalikan aplikasi ke setelan pabrik.",
   "storageResetConfirmTitle": "Konfirmasi Reset",
-  "storageResetConfirmMessage": "Apakah Anda yakin ingin mereset HokTifyy? Semua data Anda akan dihapus permanen.",
+  "storageResetConfirmMessage": "Apakah Anda yakin ingin mereset Vynora Music? Semua data Anda akan dihapus permanen.",
   "storageResetButton": "Reset",
   "storageResetSuccess": "Aplikasi berhasil dikembalikan ke setelan default.",
   "storageLocationDialogTitle": "Lokasi Cadangan",
@@ -516,11 +516,11 @@
   "updateSettingTitle": "Pembaruan",
   "updateAppUpdatesHeader": "Pembaruan Aplikasi",
   "updateCheckForUpdates": "Periksa Pembaruan",
-  "updateCheckSubtitle": "Periksa apakah ada versi baru HokTifyy.",
+  "updateCheckSubtitle": "Periksa apakah ada versi baru Vynora Music.",
   "updateAutoNotify": "Notifikasi Pembaruan Otomatis",
   "updateAutoNotifySubtitle": "Beri tahu di awal aplikasi jika ada versi baru.",
   "updateCheckTitle": "Periksa Pembaruan",
-  "updateUpToDate": "HokTifyy sudah menggunakan versi terbaru!!!",
+  "updateUpToDate": "Vynora Music sudah menggunakan versi terbaru!!!",
   "updateViewPreRelease": "Lihat Versi Pra-Rilis Terbaru",
   "updateCurrentVersion": "Versi Saat Ini: {curr} + {build}",
   "@updateCurrentVersion": {
@@ -533,7 +533,7 @@
       }
     }
   },
-  "updateNewVersionAvailable": "Versi baru HokTifyy telah tersedia!!",
+  "updateNewVersionAvailable": "Versi baru Vynora Music telah tersedia!!",
   "updateVersion": "Versi: {ver}+{build}",
   "@updateVersion": {
     "placeholders": {
@@ -726,9 +726,9 @@
   "aboutFollowGitHub": "Ikuti di GitHub",
   "aboutSendInquiry": "Kirim penawaran bisnis",
   "aboutCreativeHighlights": "Pembaruan dan sorotan kreatif",
-  "aboutTipQuote": "Menikmati HokTifyy? Dukungan kecil Anda sangat berarti. ",
+  "aboutTipQuote": "Menikmati Vynora Music? Dukungan kecil Anda sangat berarti. ",
   "aboutTipButton": "Saya ingin membantu",
-  "aboutTipDesc": "Saya ingin HokTifyy terus berkembang.",
+  "aboutTipDesc": "Saya ingin Vynora Music terus berkembang.",
   "aboutGitHub": "GitHub",
   "songInfoSectionDetails": "Detail Lagu",
   "songInfoSectionTechnical": "Informasi Teknis",
@@ -748,9 +748,9 @@
   "songInfoMetadataUpdated": "Metadata diperbarui",
   "songInfoMetadataUpdateFailed": "Gagal memperbarui metadata",
   "songInfoMetadataUnavailable": "Pembaruan metadata tidak tersedia untuk sumber ini",
-  "songInfoSearchTitle": "Cari lagu ini di HokTifyy",
-  "songInfoSearchArtist": "Cari artis ini di HokTifyy",
-  "songInfoSearchAlbum": "Cari album ini di HokTifyy",
+  "songInfoSearchTitle": "Cari lagu ini di Vynora Music",
+  "songInfoSearchArtist": "Cari artis ini di Vynora Music",
+  "songInfoSearchAlbum": "Cari album ini di Vynora Music",
   "eqTitle": "Equalizer",
   "eqResetTooltip": "Reset ke Awal",
   "chartNoItems": "Tidak ada item di bagan ini",
@@ -782,13 +782,13 @@
   "localMusicNoSearchResults": "Lagu tidak ditemukan.",
   "importSongsTitle": "Impor Lagu",
   "importNoPluginsLoaded": "Plugin pengimpor konten tidak dimuat.\nPasang plugin pengimpor untuk mengimpor playlist dari layanan eksternal.",
-  "importStreamBeatsFiles": "Impor File HokTifyy",
+  "importStreamBeatsFiles": "Impor File Vynora Music",
   "importM3UFiles": "Impor Playlist M3U",
   "importM3UNameDialogTitle": "Nama Playlist",
   "importM3UNameHint": "Masukkan nama untuk playlist ini",
   "importM3UNoTracks": "Tidak ada lagu valid ditemukan di file M3U.",
   "importNoteTitle": "Catatan",
-  "importNoteMessage": "Anda hanya dapat mengimpor file yang dibuat oleh HokTifyy.\nJika file Anda dari sumber lain, itu tidak akan berfungsi. Lanjutkan?",
+  "importNoteMessage": "Anda hanya dapat mengimpor file yang dibuat oleh Vynora Music.\nJika file Anda dari sumber lain, itu tidak akan berfungsi. Lanjutkan?",
   "importTitle": "Impor",
   "importCheckingUrl": "Memeriksa URL...",
   "importFetchingTracks": "Mengambil lagu...",
@@ -1009,7 +1009,7 @@
   "playerLoopOne": "Ulangi Satu",
   "playerLoopAll": "Ulangi Semua",
   "snackbarOpeningAlbumPage": "Membuka halaman album asli.",
-  "updateAvailableBody": "Versi baru HokTifyy telah tersedia!\n\nVersi: {ver}+{build}",
+  "updateAvailableBody": "Versi baru Vynora Music telah tersedia!\n\nVersi: {ver}+{build}",
   "@updateAvailableBody": {
     "placeholders": {
       "ver": {
@@ -1044,7 +1044,7 @@
       }
     }
   },
-  "pluginBootstrapTitle": "Menyiapkan HokTifyy",
+  "pluginBootstrapTitle": "Menyiapkan Vynora Music",
   "pluginBootstrapProgress": "Menyiapkan mesin plugin baru... {percent}%",
   "@pluginBootstrapProgress": {
     "placeholders": {
@@ -1055,6 +1055,6 @@
   },
   "pluginBootstrapHint": "Ini hanya terjadi sekali.",
   "pluginBootstrapErrorTitle": "Koneksi Terlalu Lambat",
-  "pluginBootstrapErrorBody": "Beberapa plugin tidak dapat dipasang. Anda tetap dapat menggunakan HokTifyy — plugin akan dicoba kembali saat peluncuran berikutnya.",
+  "pluginBootstrapErrorBody": "Beberapa plugin tidak dapat dipasang. Anda tetap dapat menggunakan Vynora Music — plugin akan dicoba kembali saat peluncuran berikutnya.",
   "pluginBootstrapContinue": "Lanjutkan Saja"
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:streambeats/core/theme/app_theme.dart';
 
-/// Motif khas HokTifyy: lengkung ganda (diambil dari logo) dalam gradien violet.
+/// Motif khas Vynora Music: lengkung ganda (diambil dari logo) dalam gradien violet.
 class ArchGlyph extends StatelessWidget {
   const ArchGlyph({super.key, this.size = 22});
   final double size;

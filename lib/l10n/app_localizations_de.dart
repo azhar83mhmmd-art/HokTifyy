@@ -9,7 +9,7 @@ class AppLocalizationsDe extends AppLocalizations {
   AppLocalizationsDe([String locale = 'de']) : super(locale);
 
   @override
-  String get onboardingTitle => 'Willkommen bei HokTifyy';
+  String get onboardingTitle => 'Willkommen bei Vynora Music';
 
   @override
   String get onboardingSubtitle => 'Richten wir deine Sprache und Region ein.';
@@ -335,7 +335,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wähle deine Sprache und dein Land.';
 
   @override
-  String get settingsAbout => 'Über HokTifyy';
+  String get settingsAbout => 'Über Vynora Music';
 
   @override
   String get settingsAboutSubtitle => 'Version, Entwickler und App-Info.';
@@ -1020,7 +1020,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Speichert Songtexte automatisch beim Abspielen eines Titels.';
 
   @override
-  String get storageResetApp => 'HokTifyy App zurücksetzen';
+  String get storageResetApp => 'Vynora Music App zurücksetzen';
 
   @override
   String get storageResetAppSubtitle =>
@@ -1031,7 +1031,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get storageResetConfirmMessage =>
-      'Bist du sicher, dass du HokTifyy zurücksetzen möchtest? Dies löscht alle deine Daten unwiderruflich.';
+      'Bist du sicher, dass du Vynora Music zurücksetzen möchtest? Dies löscht alle deine Daten unwiderruflich.';
 
   @override
   String get storageResetButton => 'Zurücksetzen';
@@ -1140,7 +1140,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get updateCheckSubtitle =>
-      'Prüfen, ob eine neuere Version von HokTifyy verfügbar ist.';
+      'Prüfen, ob eine neuere Version von Vynora Music verfügbar ist.';
 
   @override
   String get updateAutoNotify => 'Update-Benachrichtigung';
@@ -1153,7 +1153,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get updateCheckTitle => 'Update-Suche';
 
   @override
-  String get updateUpToDate => 'HokTifyy ist auf dem neuesten Stand!!!';
+  String get updateUpToDate => 'Vynora Music ist auf dem neuesten Stand!!!';
 
   @override
   String get updateViewPreRelease => 'Neueste Pre-Release ansehen';
@@ -1165,7 +1165,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get updateNewVersionAvailable =>
-      'Neue Version von HokTifyy verfügbar!';
+      'Neue Version von Vynora Music verfügbar!';
 
   @override
   String updateVersion(String ver, String build) {
@@ -1481,13 +1481,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get aboutTipQuote =>
-      'Gefällt dir HokTifyy? Eine kleine Unterstützung lässt die App weiter blühen. ';
+      'Gefällt dir Vynora Music? Eine kleine Unterstützung lässt die App weiter blühen. ';
 
   @override
   String get aboutTipButton => 'Ich möchte helfen';
 
   @override
-  String get aboutTipDesc => 'Ich möchte, dass HokTifyy immer besser wird.';
+  String get aboutTipDesc => 'Ich möchte, dass Vynora Music immer besser wird.';
 
   @override
   String get aboutGitHub => 'GitHub';
@@ -1549,14 +1549,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Metadaten-Update für diese Quelle nicht verfügbar';
 
   @override
-  String get songInfoSearchTitle => 'In HokTifyy nach diesem Song suchen';
+  String get songInfoSearchTitle => 'In Vynora Music nach diesem Song suchen';
 
   @override
   String get songInfoSearchArtist =>
-      'In HokTifyy nach diesem Interpreten suchen';
+      'In Vynora Music nach diesem Interpreten suchen';
 
   @override
-  String get songInfoSearchAlbum => 'In HokTifyy nach diesem Album suchen';
+  String get songInfoSearchAlbum => 'In Vynora Music nach diesem Album suchen';
 
   @override
   String get eqTitle => 'Equalizer';
@@ -1638,7 +1638,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Keine Importer-Plugins geladen.\nInstalliere ein Plugin, um Playlists externer Dienste zu importieren.';
 
   @override
-  String get importStreamBeatsFiles => 'HokTifyy-Dateien importieren';
+  String get importStreamBeatsFiles => 'Vynora Music-Dateien importieren';
 
   @override
   String get importM3UFiles => 'M3U-Playlist importieren';
@@ -1658,7 +1658,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get importNoteMessage =>
-      'Du kannst nur Dateien importieren, die von HokTifyy erstellt wurden. Andere Dateien funktionieren nicht. Trotzdem fortfahren?';
+      'Du kannst nur Dateien importieren, die von Vynora Music erstellt wurden. Andere Dateien funktionieren nicht. Trotzdem fortfahren?';
 
   @override
   String get importTitle => 'Import';
@@ -1990,7 +1990,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String updateAvailableBody(String ver, String build) {
-    return 'Neue Version von HokTifyy verfügbar!\n\nVersion: $ver+$build';
+    return 'Neue Version von Vynora Music verfügbar!\n\nVersion: $ver+$build';
   }
 
   @override
@@ -2009,7 +2009,7 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get pluginBootstrapTitle => 'HokTifyy wird eingerichtet';
+  String get pluginBootstrapTitle => 'Vynora Music wird eingerichtet';
 
   @override
   String pluginBootstrapProgress(int percent) {
@@ -2024,7 +2024,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get pluginBootstrapErrorBody =>
-      'Einige Plugins konnten nicht installiert werden. Du kannst HokTifyy dennoch nutzen – Plugins werden beim nächsten Start erneut versucht.';
+      'Einige Plugins konnten nicht installiert werden. Du kannst Vynora Music dennoch nutzen – Plugins werden beim nächsten Start erneut versucht.';
 
   @override
   String get pluginBootstrapContinue => 'Trotzdem fortfahren';

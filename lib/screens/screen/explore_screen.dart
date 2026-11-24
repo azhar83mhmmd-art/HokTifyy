@@ -24,7 +24,6 @@ import 'package:streambeats/screens/screen/home_views/notification_view.dart';
 import 'package:streambeats/screens/screen/home_views/setting_view.dart';
 import 'package:streambeats/screens/screen/home_views/timer_view.dart';
 import 'package:streambeats/core/theme/app_theme.dart';
-import 'package:streambeats/screens/widgets/home_modern_widgets.dart';
 import 'package:streambeats/l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsx_plus/iconsx_plus.dart';
@@ -35,6 +34,8 @@ import '../widgets/tab_list_widget.dart';
 import 'package:streambeats/screens/widgets/global_footer.dart';
 import 'package:streambeats/services/supabase_auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:streambeats/services/update_service.dart';
+import 'package:streambeats/screens/widgets/search_result_widgets.dart';
 import 'package:badges/badges.dart' as badges;
 
 class ExploreScreen extends StatefulWidget {
@@ -53,6 +54,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
     super.initState();
     _homeContentBloc = ContentBloc(pluginService: ServiceLocator.pluginService);
     _tryLoadHomeSections();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      UpdateService.checkUpdate(context);
+    });
   }
 
   void _tryLoadHomeSections() {
@@ -180,7 +184,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 SliverList(
                   delegate: SliverChildListDelegate(
                     [
-                      const HokMoodChips(),
                       BlocBuilder<RecentlyCubit, RecentlyCubitState>(
                         builder: (context, state) =>
                             HokDailyMixCard(tracks: state.tracks),
@@ -191,24 +194,54 @@ class _ExploreScreenState extends State<ExploreScreen> {
                         child: SizedBox(
                           child: BlocBuilder<RecentlyCubit, RecentlyCubitState>(
                             builder: (context, state) {
-                              if (state is RecentlyCubitInitial ||
-                                  state.tracks.isEmpty) {
-                                return const SizedBox.shrink();
+                              if (state is RecentlyCubitInitial) {
+                                return const Center(
+                                  child: SizedBox(
+                                    height: 60,
+                                    width: 60,
+                                    child: CircularProgressIndicator(
+                                      color: Default_Theme.accentColor2,
+                                    ),
+                                  ),
+                                );
                               }
-                              return HokQuickPicks(
-                                tracks: state.tracks,
-                                title: AppLocalizations.of(context)!
-                                    .exploreRecently,
-                                onSeeAll: () {
-                                  Navigator.push(
+                              if (state.tracks.isNotEmpty) {
+                                return HomeTrackSection(
+                                  title: AppLocalizations.of(context)!
+                                      .exploreRecently,
+                                  tracks: state.tracks,
+                                  playAllLabel: 'Putar Semua',
+                                  onTitleTap: () => Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) =>
-                                          const HistoryView(),
+                                      builder: (context) => const HistoryView(),
                                     ),
-                                  );
-                                },
-                              );
+                                  ),
+                                  onTrackTap: (i) => context
+                                      .read<StreamBeatsPlayerCubit>()
+                                      .streambeatsPlayer
+                                      .loadPlaylist(
+                                        Playlist(
+                                          tracks: state.tracks,
+                                          title: 'Recently',
+                                        ),
+                                        idx: i,
+                                        doPlay: true,
+                                      ),
+                                  onPlayAll: () => context
+                                      .read<StreamBeatsPlayerCubit>()
+                                      .streambeatsPlayer
+                                      .loadPlaylist(
+                                        Playlist(
+                                          tracks: state.tracks,
+                                          title: 'Recently',
+                                        ),
+                                        idx: 0,
+                                        doPlay: true,
+                                      ),
+                                );
+                              }
+                              return const SizedBox();
                             },
                           ),
                         ),
@@ -221,37 +254,23 @@ class _ExploreScreenState extends State<ExploreScreen> {
                               builder: (context, snapshot) {
                                 if (snapshot.hasData &&
                                     (snapshot.data?.isNotEmpty ?? false)) {
-                                  return Padding(
-                                    padding: const EdgeInsets.only(top: 15.0),
-                                    child: TabSongListWidget(
-                                      list: snapshot.data!.map((e) {
-                                        return SongCardWidget(
-                                          song: e,
-                                          onTap: () {
-                                            context
-                                                .read<StreamBeatsPlayerCubit>()
-                                                .streambeatsPlayer
-                                                .loadPlaylist(
-                                                  Playlist(
-                                                    tracks: snapshot.data!,
-                                                    title: 'Last.Fm Picks',
-                                                  ),
-                                                  idx:
-                                                      snapshot.data!.indexOf(e),
-                                                  doPlay: true,
-                                                );
-                                          },
-                                          onOptionsTap: () =>
-                                              showMoreBottomSheet(
-                                                  context,
-                                                  showSinglePlay: true,
-                                                  e),
-                                        );
-                                      }).toList(),
-                                      category: AppLocalizations.of(context)!
-                                          .exploreLastFmPicks,
-                                      columnSize: 3,
-                                    ),
+                                  final picks = snapshot.data!;
+                                  Playlist pl() => Playlist(
+                                      tracks: picks, title: 'Last.Fm Picks');
+                                  return HomeTrackSection(
+                                    title: AppLocalizations.of(context)!
+                                        .exploreLastFmPicks,
+                                    tracks: picks,
+                                    onTrackTap: (i) => context
+                                        .read<StreamBeatsPlayerCubit>()
+                                        .streambeatsPlayer
+                                        .loadPlaylist(pl(),
+                                            idx: i, doPlay: true),
+                                    onPlayAll: () => context
+                                        .read<StreamBeatsPlayerCubit>()
+                                        .streambeatsPlayer
+                                        .loadPlaylist(pl(),
+                                            idx: 0, doPlay: true),
                                   );
                                 }
                                 return const SizedBox.shrink();

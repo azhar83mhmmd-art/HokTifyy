@@ -9,7 +9,7 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
-  String get onboardingTitle => 'Bienvenido a HokTifyy';
+  String get onboardingTitle => 'Bienvenido a Vynora Music';
 
   @override
   String get onboardingSubtitle => 'Configuremos tu idioma y región.';
@@ -1015,7 +1015,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'Guardar letras automáticamente al reproducir una canción.';
 
   @override
-  String get storageResetApp => 'Restablecer HokTifyy';
+  String get storageResetApp => 'Restablecer Vynora Music';
 
   @override
   String get storageResetAppSubtitle =>
@@ -1026,7 +1026,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get storageResetConfirmMessage =>
-      '¿Estás seguro de que quieres restablecer HokTifyy? Esto borrará todos tus datos y no se puede deshacer.';
+      '¿Estás seguro de que quieres restablecer Vynora Music? Esto borrará todos tus datos y no se puede deshacer.';
 
   @override
   String get storageResetButton => 'Restablecer';
@@ -1136,7 +1136,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get updateCheckSubtitle =>
-      'Comprobar si hay una versión más nueva de HokTifyy.';
+      'Comprobar si hay una versión más nueva de Vynora Music.';
 
   @override
   String get updateAutoNotify => 'Notificar actualizaciones';
@@ -1149,7 +1149,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get updateCheckTitle => 'Búsqueda de actualizaciones';
 
   @override
-  String get updateUpToDate => '¡HokTifyy está al día!';
+  String get updateUpToDate => '¡Vynora Music está al día!';
 
   @override
   String get updateViewPreRelease => 'Ver última Pre-Release';
@@ -1161,7 +1161,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get updateNewVersionAvailable =>
-      '¡Hay una nueva versión de HokTifyy disponible!';
+      '¡Hay una nueva versión de Vynora Music disponible!';
 
   @override
   String updateVersion(String ver, String build) {
@@ -1477,13 +1477,13 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get aboutTipQuote =>
-      '¿Te gusta HokTifyy? Tu apoyo ayuda a que siga creciendo. ';
+      '¿Te gusta Vynora Music? Tu apoyo ayuda a que siga creciendo. ';
 
   @override
   String get aboutTipButton => 'Quiero ayudar';
 
   @override
-  String get aboutTipDesc => 'Quiero que HokTifyy siga mejorando.';
+  String get aboutTipDesc => 'Quiero que Vynora Music siga mejorando.';
 
   @override
   String get aboutGitHub => 'GitHub';
@@ -1544,13 +1544,13 @@ class AppLocalizationsEs extends AppLocalizations {
       'Actualización no disponible para esta fuente';
 
   @override
-  String get songInfoSearchTitle => 'Buscar esta canción en HokTifyy';
+  String get songInfoSearchTitle => 'Buscar esta canción en Vynora Music';
 
   @override
-  String get songInfoSearchArtist => 'Buscar este artista en HokTifyy';
+  String get songInfoSearchArtist => 'Buscar este artista en Vynora Music';
 
   @override
-  String get songInfoSearchAlbum => 'Buscar este álbum en HokTifyy';
+  String get songInfoSearchAlbum => 'Buscar este álbum en Vynora Music';
 
   @override
   String get eqTitle => 'Ecualizador';
@@ -1629,7 +1629,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'No hay plugins importadores cargados.\nInstala uno para importar desde servicios externos.';
 
   @override
-  String get importStreamBeatsFiles => 'Importar archivos HokTifyy';
+  String get importStreamBeatsFiles => 'Importar archivos Vynora Music';
 
   @override
   String get importM3UFiles => 'Importar lista M3U';
@@ -1649,7 +1649,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get importNoteMessage =>
-      'Solo puedes importar archivos creados por HokTifyy.\nSi es de otra fuente, no funcionará. ¿Continuar?';
+      'Solo puedes importar archivos creados por Vynora Music.\nSi es de otra fuente, no funcionará. ¿Continuar?';
 
   @override
   String get importTitle => 'Importar';
@@ -1982,7 +1982,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String updateAvailableBody(String ver, String build) {
-    return '¡Nueva versión de HokTifyy disponible!\n\nVersión: $ver+$build';
+    return '¡Nueva versión de Vynora Music disponible!\n\nVersión: $ver+$build';
   }
 
   @override
@@ -2001,7 +2001,7 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get pluginBootstrapTitle => 'Configurando HokTifyy';
+  String get pluginBootstrapTitle => 'Configurando Vynora Music';
 
   @override
   String pluginBootstrapProgress(int percent) {
@@ -2016,7 +2016,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get pluginBootstrapErrorBody =>
-      'No se instalaron algunos plugins. Puedes usar HokTifyy, se reintentará en el próximo inicio.';
+      'No se instalaron algunos plugins. Puedes usar Vynora Music, se reintentará en el próximo inicio.';
 
   @override
   String get pluginBootstrapContinue => 'Continuar de todos modos';

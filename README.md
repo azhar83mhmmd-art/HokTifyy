@@ -1,6 +1,6 @@
-<p align="center"><img src="assets/icons/hoktifyy_logo.png" width="160" alt="HokTifyy"></p>
+<p align="center"><img src="assets/icons/hoktifyy_logo.png" width="160" alt="Vynora Music"></p>
 
-# HokTifyy
+# Vynora Music
 
 Pemutar musik gratis tanpa iklan (Flutter + Rust). Turunan dari **StreamBeats**
 (© 2026 DuskCipher) — source oleh **Valora Official**. Lisensi **GPL v2+** (lihat [`LICENSE`](LICENSE), [`NOTICE.md`](NOTICE.md)).
@@ -16,7 +16,7 @@ Ringkas:
 ```bash
 # di Termux
 pkg install -y git
-git clone https://github.com/USERNAME/HokTifyy && cd HokTifyy   # atau ekstrak zip source
+git clone https://github.com/USERNAME/HokTifyy && cd Vynora Music   # atau ekstrak zip source
 bash termux/setup.sh      # sekali saja: login GitHub, repo, secrets Supabase, keystore
 bash termux/build.sh      # build di GitHub lalu install otomatis
 ```

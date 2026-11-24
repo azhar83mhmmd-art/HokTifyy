@@ -1,4 +1,4 @@
-#define MyAppName "HokTifyy"
+#define MyAppName "Vynora Music"
 #define MyAppPublisher "Valora Official"
 #define MyAppURL "https://streambeats.pages.dev/"
 #define MyAppExeName "streambeats.exe"
@@ -15,7 +15,7 @@ DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
 OutputDir=..\build\windows\x64\runner
-OutputBaseFilename=HokTifyy-Setup
+OutputBaseFilename=VynoraMusic-Setup
 Compression=lzma2/max
 SolidCompression=yes
 WizardStyle=modern

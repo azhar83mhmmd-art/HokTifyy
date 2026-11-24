@@ -113,7 +113,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingTitle.
   ///
   /// In en, this message translates to:
-  /// **'Welcome to HokTifyy'**
+  /// **'Welcome to Vynora Music'**
   String get onboardingTitle;
 
   /// No description provided for @onboardingSubtitle.
@@ -1871,7 +1871,7 @@ abstract class AppLocalizations {
   /// No description provided for @storageResetApp.
   ///
   /// In en, this message translates to:
-  /// **'Reset HokTifyy App'**
+  /// **'Reset Vynora Music App'**
   String get storageResetApp;
 
   /// No description provided for @storageResetAppSubtitle.
@@ -1889,7 +1889,7 @@ abstract class AppLocalizations {
   /// No description provided for @storageResetConfirmMessage.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to reset HokTifyy? This will delete all your data and cannot be undone.'**
+  /// **'Are you sure you want to reset Vynora Music? This will delete all your data and cannot be undone.'**
   String get storageResetConfirmMessage;
 
   /// No description provided for @storageResetButton.
@@ -2081,7 +2081,7 @@ abstract class AppLocalizations {
   /// No description provided for @updateCheckSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'See if a newer version of HokTifyy is available.'**
+  /// **'See if a newer version of Vynora Music is available.'**
   String get updateCheckSubtitle;
 
   /// No description provided for @updateAutoNotify.
@@ -2105,7 +2105,7 @@ abstract class AppLocalizations {
   /// No description provided for @updateUpToDate.
   ///
   /// In en, this message translates to:
-  /// **'HokTifyy is up-to-date!!!'**
+  /// **'Vynora Music is up-to-date!!!'**
   String get updateUpToDate;
 
   /// No description provided for @updateViewPreRelease.
@@ -2123,7 +2123,7 @@ abstract class AppLocalizations {
   /// No description provided for @updateNewVersionAvailable.
   ///
   /// In en, this message translates to:
-  /// **'New Version of HokTifyy is now available!!'**
+  /// **'New Version of Vynora Music is now available!!'**
   String get updateNewVersionAvailable;
 
   /// No description provided for @updateVersion.
@@ -2681,7 +2681,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutTipQuote.
   ///
   /// In en, this message translates to:
-  /// **'Enjoying HokTifyy? A small tip keeps it blooming. '**
+  /// **'Enjoying Vynora Music? A small tip keeps it blooming. '**
   String get aboutTipQuote;
 
   /// No description provided for @aboutTipButton.
@@ -2693,7 +2693,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutTipDesc.
   ///
   /// In en, this message translates to:
-  /// **'I want HokTifyy to keep improving.'**
+  /// **'I want Vynora Music to keep improving.'**
   String get aboutTipDesc;
 
   /// No description provided for @aboutGitHub.
@@ -2813,19 +2813,19 @@ abstract class AppLocalizations {
   /// No description provided for @songInfoSearchTitle.
   ///
   /// In en, this message translates to:
-  /// **'Search for this song in HokTifyy'**
+  /// **'Search for this song in Vynora Music'**
   String get songInfoSearchTitle;
 
   /// No description provided for @songInfoSearchArtist.
   ///
   /// In en, this message translates to:
-  /// **'Search for this artist in HokTifyy'**
+  /// **'Search for this artist in Vynora Music'**
   String get songInfoSearchArtist;
 
   /// No description provided for @songInfoSearchAlbum.
   ///
   /// In en, this message translates to:
-  /// **'Search for this album in HokTifyy'**
+  /// **'Search for this album in Vynora Music'**
   String get songInfoSearchAlbum;
 
   /// No description provided for @eqTitle.
@@ -2975,7 +2975,7 @@ abstract class AppLocalizations {
   /// No description provided for @importStreamBeatsFiles.
   ///
   /// In en, this message translates to:
-  /// **'Import HokTifyy Files'**
+  /// **'Import Vynora Music Files'**
   String get importStreamBeatsFiles;
 
   /// No description provided for @importM3UFiles.
@@ -3011,7 +3011,7 @@ abstract class AppLocalizations {
   /// No description provided for @importNoteMessage.
   ///
   /// In en, this message translates to:
-  /// **'You can only import files created by HokTifyy.\nIf your file is from another source, it will not work. Continue anyway?'**
+  /// **'You can only import files created by Vynora Music.\nIf your file is from another source, it will not work. Continue anyway?'**
   String get importNoteMessage;
 
   /// No description provided for @importTitle.
@@ -3551,7 +3551,7 @@ abstract class AppLocalizations {
   /// No description provided for @updateAvailableBody.
   ///
   /// In en, this message translates to:
-  /// **'New Version of HokTifyy is now available!\n\nVersion: {ver}+{build}'**
+  /// **'New Version of Vynora Music is now available!\n\nVersion: {ver}+{build}'**
   String updateAvailableBody(String ver, String build);
 
   /// No description provided for @pluginSnackbarInstalled.
@@ -3575,7 +3575,7 @@ abstract class AppLocalizations {
   /// No description provided for @pluginBootstrapTitle.
   ///
   /// In en, this message translates to:
-  /// **'Setting up HokTifyy'**
+  /// **'Setting up Vynora Music'**
   String get pluginBootstrapTitle;
 
   /// No description provided for @pluginBootstrapProgress.
@@ -3599,7 +3599,7 @@ abstract class AppLocalizations {
   /// No description provided for @pluginBootstrapErrorBody.
   ///
   /// In en, this message translates to:
-  /// **'Some plugins could not be installed. You can still use HokTifyy — plugins will be retried on next launch.'**
+  /// **'Some plugins could not be installed. You can still use Vynora Music — plugins will be retried on next launch.'**
   String get pluginBootstrapErrorBody;
 
   /// No description provided for @pluginBootstrapContinue.

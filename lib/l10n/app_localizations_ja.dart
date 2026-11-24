@@ -9,7 +9,7 @@ class AppLocalizationsJa extends AppLocalizations {
   AppLocalizationsJa([String locale = 'ja']) : super(locale);
 
   @override
-  String get onboardingTitle => 'HokTifyyへようこそ';
+  String get onboardingTitle => 'Vynora Musicへようこそ';
 
   @override
   String get onboardingSubtitle => '言語と地域の設定を行いましょう。';
@@ -1052,7 +1052,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get updateCheckForUpdates => 'アップデートを確認';
 
   @override
-  String get updateCheckSubtitle => 'HokTifyy の新しいバージョンがあるか確認します。';
+  String get updateCheckSubtitle => 'Vynora Music の新しいバージョンがあるか確認します。';
 
   @override
   String get updateAutoNotify => 'アップデートの自動通知';
@@ -1064,7 +1064,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get updateCheckTitle => '更新の確認';
 
   @override
-  String get updateUpToDate => 'HokTifyy は最新の状態です！';
+  String get updateUpToDate => 'Vynora Music は最新の状態です！';
 
   @override
   String get updateViewPreRelease => '最新のプレリリースを表示';
@@ -1075,7 +1075,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get updateNewVersionAvailable => 'HokTifyy の新しいバージョンが利用可能です！';
+  String get updateNewVersionAvailable => 'Vynora Music の新しいバージョンが利用可能です！';
 
   @override
   String updateVersion(String ver, String build) {
@@ -1380,7 +1380,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get aboutCreativeHighlights => 'アップデートとクリエイティブな活動';
 
   @override
-  String get aboutTipQuote => 'HokTifyy を気に入っていただけましたか？応援が活動の励みになります。 ';
+  String get aboutTipQuote => 'Vynora Music を気に入っていただけましたか？応援が活動の励みになります。 ';
 
   @override
   String get aboutTipButton => '応援する';
@@ -1446,13 +1446,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get songInfoMetadataUnavailable => 'このソースは情報の更新に対応していません';
 
   @override
-  String get songInfoSearchTitle => 'HokTifyy でこの曲を検索';
+  String get songInfoSearchTitle => 'Vynora Music でこの曲を検索';
 
   @override
-  String get songInfoSearchArtist => 'HokTifyy でこのアーティストを検索';
+  String get songInfoSearchArtist => 'Vynora Music でこのアーティストを検索';
 
   @override
-  String get songInfoSearchAlbum => 'HokTifyy でこのアルバムを検索';
+  String get songInfoSearchAlbum => 'Vynora Music でこのアルバムを検索';
 
   @override
   String get eqTitle => 'イコライザー';
@@ -1530,7 +1530,7 @@ class AppLocalizationsJa extends AppLocalizations {
       'インポータープラグインがありません。外部サービスから取り込むにはインストールしてください。';
 
   @override
-  String get importStreamBeatsFiles => 'HokTifyy ファイルをインポート';
+  String get importStreamBeatsFiles => 'Vynora Music ファイルをインポート';
 
   @override
   String get importM3UFiles => 'M3U プレイリストをインポート';
@@ -1548,7 +1548,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get importNoteTitle => '注記';
 
   @override
-  String get importNoteMessage => 'HokTifyy で作成されたファイルのみが対象です。続行しますか？';
+  String get importNoteMessage => 'Vynora Music で作成されたファイルのみが対象です。続行しますか？';
 
   @override
   String get importTitle => 'インポート';
@@ -1854,7 +1854,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String updateAvailableBody(String ver, String build) {
-    return 'HokTifyy の新しいバージョンが利用可能です！\n\nバージョン: $ver+$build';
+    return 'Vynora Music の新しいバージョンが利用可能です！\n\nバージョン: $ver+$build';
   }
 
   @override
@@ -1873,7 +1873,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get pluginBootstrapTitle => 'HokTifyy をセットアップ中';
+  String get pluginBootstrapTitle => 'Vynora Music をセットアップ中';
 
   @override
   String pluginBootstrapProgress(int percent) {

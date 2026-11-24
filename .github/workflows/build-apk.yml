@@ -1,7 +1,7 @@
-name: "Build HokTifyy APK"
+name: "Build Vynora Music APK"
 
 # Cara pakai:
-#   - Manual : tab Actions -> "Build HokTifyy APK" -> Run workflow
+#   - Manual : tab Actions -> "Build Vynora Music APK" -> Run workflow
 #   - Otomatis: push tag, mis. `git tag v2.0.0+1 && git push --tags`
 # Hasil: APK ada di tab Releases (dan di Artifacts).
 
@@ -95,7 +95,7 @@ jobs:
             echo "::warning::KEYSTORE_BASE64 belum diisi. Membuat keystore SEMENTARA - APK tidak bisa di-update menimpa build sebelumnya. Jalankan termux/setup.sh agar keystore tetap."
             keytool -genkeypair -v -keystore android/hoktifyy.jks -keyalg RSA -keysize 2048 \
               -validity 10000 -alias hoktifyy -storepass hoktifyy-temp -keypass hoktifyy-temp \
-              -dname "CN=HokTifyy, OU=Mobile, O=HokTifyy, C=ID"
+              -dname "CN=Vynora Music, OU=Mobile, O=Vynora Music, C=ID"
             printf 'storePassword=hoktifyy-temp\nkeyPassword=hoktifyy-temp\nkeyAlias=hoktifyy\nstoreFile=hoktifyy.jks\n' > android/key.properties
           fi
 
@@ -118,12 +118,12 @@ jobs:
           ls -la
           mkdir -p ../../../../dist
           for abi in arm64-v8a armeabi-v7a x86_64; do
-            [ -f "app-${abi}-release.apk" ] && cp "app-${abi}-release.apk" "../../../../dist/HokTifyy-android-${abi}.apk"
+            [ -f "app-${abi}-release.apk" ] && cp "app-${abi}-release.apk" "../../../../dist/VynoraMusic-android-${abi}.apk"
           done
           if [ -f app-universal-release.apk ]; then
-            cp app-universal-release.apk ../../../../dist/HokTifyy-android-universal.apk
+            cp app-universal-release.apk ../../../../dist/VynoraMusic-android-universal.apk
           elif [ -f app-release.apk ]; then
-            cp app-release.apk ../../../../dist/HokTifyy-android-universal.apk
+            cp app-release.apk ../../../../dist/VynoraMusic-android-universal.apk
           fi
           ls -la ../../../../dist
 
@@ -138,7 +138,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: HokTifyy-apk
+          name: VynoraMusic-apk
           path: dist/*.apk
           if-no-files-found: error
 
@@ -146,9 +146,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          NOTES="HokTifyy ${VERSION} (build ${BUILD}). Pilih APK sesuai HP: arm64-v8a untuk HP modern, universal bila ragu."
+          NOTES="Vynora Music ${VERSION} (build ${BUILD}). Pilih APK sesuai HP: arm64-v8a untuk HP modern, universal bila ragu."
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" dist/*.apk --clobber
           else
-            gh release create "$TAG" dist/*.apk --target "$GITHUB_SHA" --title "HokTifyy $TAG" --notes "$NOTES"
+            gh release create "$TAG" dist/*.apk --target "$GITHUB_SHA" --title "Vynora Music $TAG" --notes "$NOTES"
           fi

@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:streambeats/src/rust/api/plugin/commands.dart' show ContentSearchFilter;
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsx_plus/iconsx_plus.dart';
@@ -29,30 +30,23 @@ class SearchTexts {
       _t('Cari lagu, artis, album...', 'Search songs, artists, albums...');
   String get backToVibes => _t('Kembali ke Getaran', 'Back to Vibes');
   String get sources => _t('SUMBER', 'SOURCES');
-
-  // --- Hasil pencarian bergaya Sonara ---
   String get topResult => _t('Hasil Teratas', 'Top Result');
   String get playNow => _t('Mainkan Sekarang', 'Play Now');
-  String get radio => 'Radio';
   String get playAll => _t('Putar Semua', 'Play All');
   String songsFor(String q) =>
-      _t('Lagu-lagu untuk \u201C$q\u201D', 'Songs for \u201C$q\u201D');
-
-  /// Label chip filter. [name] = nama enum ContentSearchFilter.
-  String filterLabel(String name) {
-    switch (name) {
-      case 'all':
+      _t('Lagu-lagu untuk “ $q ”', 'Songs for “ $q ”');
+  String filterLabel(ContentSearchFilter f) {
+    switch (f) {
+      case ContentSearchFilter.all:
         return _t('Semua', 'All');
-      case 'track':
+      case ContentSearchFilter.track:
         return _t('Lagu', 'Songs');
-      case 'album':
+      case ContentSearchFilter.album:
         return 'Album';
-      case 'artist':
+      case ContentSearchFilter.artist:
         return _t('Artis', 'Artists');
-      case 'playlist':
+      case ContentSearchFilter.playlist:
         return 'Playlist';
-      default:
-        return name;
     }
   }
 }
@@ -547,7 +541,7 @@ class _VibeCardState extends State<_VibeCard> {
   @override
   Widget build(BuildContext context) {
     final s = widget.spec;
-    // Sudut miring bergantian: ciri khas kartu HokTifyy.
+    // Sudut miring bergantian: ciri khas kartu Vynora Music.
     final radius = widget.flip
         ? const BorderRadius.only(
             topLeft: Radius.circular(12),

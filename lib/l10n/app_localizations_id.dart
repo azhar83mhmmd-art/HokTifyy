@@ -9,7 +9,7 @@ class AppLocalizationsId extends AppLocalizations {
   AppLocalizationsId([String locale = 'id']) : super(locale);
 
   @override
-  String get onboardingTitle => 'Selamat Datang di HokTifyy';
+  String get onboardingTitle => 'Selamat Datang di Vynora Music';
 
   @override
   String get onboardingSubtitle => 'Mari atur bahasa dan wilayah Anda.';
@@ -1008,7 +1008,7 @@ class AppLocalizationsId extends AppLocalizations {
       'Simpan lirik secara otomatis saat lagu diputar.';
 
   @override
-  String get storageResetApp => 'Reset Aplikasi HokTifyy';
+  String get storageResetApp => 'Reset Aplikasi Vynora Music';
 
   @override
   String get storageResetAppSubtitle =>
@@ -1019,7 +1019,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get storageResetConfirmMessage =>
-      'Apakah Anda yakin ingin mereset HokTifyy? Semua data Anda akan dihapus permanen.';
+      'Apakah Anda yakin ingin mereset Vynora Music? Semua data Anda akan dihapus permanen.';
 
   @override
   String get storageResetButton => 'Reset';
@@ -1128,7 +1128,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get updateCheckSubtitle =>
-      'Periksa apakah ada versi baru HokTifyy.';
+      'Periksa apakah ada versi baru Vynora Music.';
 
   @override
   String get updateAutoNotify => 'Notifikasi Pembaruan Otomatis';
@@ -1141,7 +1141,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get updateCheckTitle => 'Periksa Pembaruan';
 
   @override
-  String get updateUpToDate => 'HokTifyy sudah menggunakan versi terbaru!!!';
+  String get updateUpToDate => 'Vynora Music sudah menggunakan versi terbaru!!!';
 
   @override
   String get updateViewPreRelease => 'Lihat Versi Pra-Rilis Terbaru';
@@ -1153,7 +1153,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get updateNewVersionAvailable =>
-      'Versi baru HokTifyy telah tersedia!!';
+      'Versi baru Vynora Music telah tersedia!!';
 
   @override
   String updateVersion(String ver, String build) {
@@ -1472,13 +1472,13 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get aboutTipQuote =>
-      'Menikmati HokTifyy? Dukungan kecil Anda sangat berarti. ';
+      'Menikmati Vynora Music? Dukungan kecil Anda sangat berarti. ';
 
   @override
   String get aboutTipButton => 'Saya ingin membantu';
 
   @override
-  String get aboutTipDesc => 'Saya ingin HokTifyy terus berkembang.';
+  String get aboutTipDesc => 'Saya ingin Vynora Music terus berkembang.';
 
   @override
   String get aboutGitHub => 'GitHub';
@@ -1539,13 +1539,13 @@ class AppLocalizationsId extends AppLocalizations {
       'Pembaruan metadata tidak tersedia untuk sumber ini';
 
   @override
-  String get songInfoSearchTitle => 'Cari lagu ini di HokTifyy';
+  String get songInfoSearchTitle => 'Cari lagu ini di Vynora Music';
 
   @override
-  String get songInfoSearchArtist => 'Cari artis ini di HokTifyy';
+  String get songInfoSearchArtist => 'Cari artis ini di Vynora Music';
 
   @override
-  String get songInfoSearchAlbum => 'Cari album ini di HokTifyy';
+  String get songInfoSearchAlbum => 'Cari album ini di Vynora Music';
 
   @override
   String get eqTitle => 'Equalizer';
@@ -1625,7 +1625,7 @@ class AppLocalizationsId extends AppLocalizations {
       'Plugin pengimpor konten tidak dimuat.\nPasang plugin pengimpor untuk mengimpor playlist dari layanan eksternal.';
 
   @override
-  String get importStreamBeatsFiles => 'Impor File HokTifyy';
+  String get importStreamBeatsFiles => 'Impor File Vynora Music';
 
   @override
   String get importM3UFiles => 'Impor Playlist M3U';
@@ -1644,7 +1644,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get importNoteMessage =>
-      'Anda hanya dapat mengimpor file yang dibuat oleh HokTifyy.\nJika file Anda dari sumber lain, itu tidak akan berfungsi. Lanjutkan?';
+      'Anda hanya dapat mengimpor file yang dibuat oleh Vynora Music.\nJika file Anda dari sumber lain, itu tidak akan berfungsi. Lanjutkan?';
 
   @override
   String get importTitle => 'Impor';
@@ -1978,7 +1978,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String updateAvailableBody(String ver, String build) {
-    return 'Versi baru HokTifyy telah tersedia!\n\nVersi: $ver+$build';
+    return 'Versi baru Vynora Music telah tersedia!\n\nVersi: $ver+$build';
   }
 
   @override
@@ -1997,7 +1997,7 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
-  String get pluginBootstrapTitle => 'Menyiapkan HokTifyy';
+  String get pluginBootstrapTitle => 'Menyiapkan Vynora Music';
 
   @override
   String pluginBootstrapProgress(int percent) {
@@ -2012,7 +2012,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get pluginBootstrapErrorBody =>
-      'Beberapa plugin tidak dapat dipasang. Anda tetap dapat menggunakan HokTifyy — plugin akan dicoba kembali saat peluncuran berikutnya.';
+      'Beberapa plugin tidak dapat dipasang. Anda tetap dapat menggunakan Vynora Music — plugin akan dicoba kembali saat peluncuran berikutnya.';
 
   @override
   String get pluginBootstrapContinue => 'Lanjutkan Saja';

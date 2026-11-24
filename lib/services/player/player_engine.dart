@@ -147,10 +147,10 @@ class PlayerEngine {
   PlayerEngine() {
     _playerA = Player(
         configuration: const PlayerConfiguration(
-            title: 'HokTifyy', bufferSize: 16 * 1024 * 1024));
+            title: 'Vynora Music', bufferSize: 16 * 1024 * 1024));
     _playerB = Player(
         configuration: const PlayerConfiguration(
-            title: 'HokTifyy', bufferSize: 16 * 1024 * 1024));
+            title: 'Vynora Music', bufferSize: 16 * 1024 * 1024));
 
     _configureNativePlayer(_playerA);
     _configureNativePlayer(_playerB);

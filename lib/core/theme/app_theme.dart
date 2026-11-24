@@ -11,7 +11,7 @@ class AppTheme {
   static const fontAwesomeSolidFont =
       TextStyle(fontFamily: "FontAwesome-Solids");
 
-  // ---- Palet HokTifyy (violet, selaras dengan ikon) ----------------------
+  // ---- Palet Vynora Music (violet, selaras dengan ikon) ----------------------
   static const themeColor = Color(0xFF000000);         // latar utama (tonal gelap, gaya Sonara)
   static const primaryColor1 = Color(0xFFFFFFFF);      // putih (teks utama)
   static const primaryColor2 = Color(0xFFB9B9C9);      // teks sekunder

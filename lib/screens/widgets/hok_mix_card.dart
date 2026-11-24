@@ -13,7 +13,7 @@ import 'package:streambeats/core/widgets/hok_signature.dart';
 import 'package:streambeats/utils/load_image.dart';
 
 /// Kartu sorotan beranda (terinspirasi "Campuran Sorotan Harian" Sonara).
-/// Ciri khas HokTifyy: sampul berbentuk lengkung ganda (motif logo) di atas
+/// Ciri khas Vynora Music: sampul berbentuk lengkung ganda (motif logo) di atas
 /// latar blur dari sampul lagu pertama.
 class HokDailyMixCard extends StatelessWidget {
   const HokDailyMixCard({super.key, required this.tracks});

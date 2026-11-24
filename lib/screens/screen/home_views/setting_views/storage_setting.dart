@@ -103,8 +103,8 @@ class BackupSettings extends StatelessWidget {
                                   SharePlus.instance
                                       .share(ShareParams(
                                     files: [XFile(value)],
-                                    text: 'HokTifyy backup file',
-                                    subject: 'HokTifyy Backup',
+                                    text: 'Vynora Music backup file',
+                                    subject: 'Vynora Music Backup',
                                   ))
                                       .catchError((e) {
                                     SnackbarService.showMessage(
@@ -140,8 +140,8 @@ class BackupSettings extends StatelessWidget {
                                   SharePlus.instance
                                       .share(ShareParams(
                                     files: [XFile(value)],
-                                    text: 'HokTifyy JSON backup file',
-                                    subject: 'HokTifyy JSON Backup',
+                                    text: 'Vynora Music JSON backup file',
+                                    subject: 'Vynora Music JSON Backup',
                                   ))
                                       .catchError((e) {
                                     SnackbarService.showMessage(

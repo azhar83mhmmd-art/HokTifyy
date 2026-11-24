@@ -5,10 +5,10 @@ import 'package:flutter/services.dart';
 
 import 'package:streambeats/core/theme/app_theme.dart';
 
-/// Komponen UI pemutar bergaya "Sonara" dengan ciri khas HokTifyy:
+/// Komponen UI pemutar bergaya "Sonara" dengan ciri khas Vynora Music:
 ///  * [WavySeekBar]      – progress bar bergelombang (gelombang suara).
 ///  * [SoundArcs]        – lengkung gelombang suara di sisi sampul (diambil
-///                         dari logo HokTifyy), berdenyut saat lagu diputar.
+///                         dari logo Vynora Music), berdenyut saat lagu diputar.
 ///  * [HokSegmentedTabs] – tab segmented berbentuk pil.
 ///  * [HokPillChip]      – chip aksi kecil (EQ, Timer, Kecepatan, dst).
 
@@ -242,7 +242,7 @@ class _WavyPainter extends CustomPainter {
 }
 
 // ---------------------------------------------------------------------------
-// SoundArcs  (ciri khas HokTifyy: lengkung gelombang suara dari logo)
+// SoundArcs  (ciri khas Vynora Music: lengkung gelombang suara dari logo)
 // ---------------------------------------------------------------------------
 
 class SoundArcs extends StatefulWidget {

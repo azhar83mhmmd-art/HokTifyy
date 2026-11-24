@@ -10,7 +10,7 @@ import 'package:supabase_flutter/supabase_flutter.dart' show AuthException;
 
 enum _AuthMode { login, signup, forgot }
 
-/// Layar login awal HokTifyy: email + kata sandi, Google, atau tamu.
+/// Layar login awal Vynora Music: email + kata sandi, Google, atau tamu.
 /// Responsif: satu kolom di HP, dua panel di tablet/desktop.
 class LoginScreen extends StatelessWidget {
   final VoidCallback onComplete;
@@ -278,7 +278,7 @@ class _LoginBodyState extends State<_LoginBody> {
         ShaderMask(
           shaderCallback: (r) => Default_Theme.brandGradient.createShader(r),
           child: const Text(
-            'HokTifyy',
+            'Vynora Music',
             style: TextStyle(
               color: Colors.white,
               fontSize: 30,
@@ -627,7 +627,7 @@ class _BrandPanel extends StatelessWidget {
               const SizedBox(height: 24),
               ShaderMask(
                 shaderCallback: (r) => Default_Theme.brandGradient.createShader(r),
-                child: const Text('HokTifyy',
+                child: const Text('Vynora Music',
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: 44,

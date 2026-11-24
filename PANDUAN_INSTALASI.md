@@ -1,4 +1,4 @@
-# Panduan Instalasi HokTifyy (Termux + GitHub Actions + Supabase)
+# Panduan Instalasi Vynora Music (Termux + GitHub Actions + Supabase)
 
 > **Cara kerjanya:** Flutter + Rust **tidak bisa dikompilasi langsung di Termux** (tidak ada SDK Flutter resmi untuk Android, dan build butuh Android NDK + Rust). Karena itu:
 >
@@ -77,17 +77,17 @@ termux-setup-storage          # izinkan akses penyimpanan
 
 Salin source ke Termux. Pilih salah satu:
 
-**A. Dari zip di HP** (mis. `HokTifyy-source.zip` ada di folder Download):
+**A. Dari zip di HP** (mis. `Vynora Music-source.zip` ada di folder Download):
 ```bash
 cd ~
 unzip ~/storage/downloads/HokTifyy-source.zip
-cd HokTifyy
+cd Vynora Music
 ```
 
 **B. Dari repo yang sudah ada:**
 ```bash
 git clone https://github.com/USERNAME/HokTifyy
-cd HokTifyy
+cd Vynora Music
 ```
 
 ---
@@ -102,7 +102,7 @@ Skrip akan menanyakan/ mengerjakan berurutan:
 
 1. Memasang `git`, `gh` (GitHub CLI), `openjdk-17`, `jq`, `termux-api`, `openssl`.
 2. **Login GitHub** — pilih *GitHub.com → HTTPS → Login with a web browser*. Salin kode 8 karakter, buka link di browser HP, masukkan kode, setujui.
-3. Membuat repo (default `HokTifyy`, **public**) dan meng-upload source.
+3. Membuat repo (default `Vynora Music`, **public**) dan meng-upload source.
    *Public disarankan:* lisensi GPL mewajibkan source tersedia bagi penerima APK, dan fitur cek-update di dalam aplikasi hanya bisa membaca release repo public.
 4. Meminta `SUPABASE_URL`, `SUPABASE_ANON_KEY` (dari langkah 2.3) dan `GOOGLE_WEB_CLIENT_ID` (boleh kosong dulu) → disimpan sebagai **GitHub Secrets**.
 5. Membuat **keystore** penanda-tangan APK di `~/.hoktifyy-keystore/` dan mengunggahnya sebagai secret.
@@ -122,7 +122,7 @@ bash termux/build.sh
 
 Yang terjadi:
 1. Perubahan terbaru di-push ke GitHub.
-2. Workflow **Build HokTifyy APK** dijalankan; Termux memantau progresnya (`gh run watch`).
+2. Workflow **Build Vynora Music APK** dijalankan; Termux memantau progresnya (`gh run watch`).
 3. Setelah sukses, `termux/install.sh` mengunduh APK sesuai arsitektur HP (arm64-v8a / x86_64 / universal), menyalin ke folder **Download**, lalu membuka installer Android.
 4. Jika diminta, aktifkan **"Izinkan dari sumber ini"** untuk Termux → tekan **Install**.
 
@@ -137,10 +137,10 @@ atau buka tab **Releases** di repo dan unduh APK langsung dari browser:
 
 | File | Untuk |
 |---|---|
-| `HokTifyy-android-arm64-v8a.apk` | HP modern (hampir semua HP sejak ±2017) |
-| `HokTifyy-android-armeabi-v7a.apk` | HP 32-bit lama |
-| `HokTifyy-android-x86_64.apk` | Emulator / Chromebook |
-| `HokTifyy-android-universal.apk` | **Bingung? pilih ini** (lebih besar, cocok di semua) |
+| `Vynora Music-android-arm64-v8a.apk` | HP modern (hampir semua HP sejak ±2017) |
+| `Vynora Music-android-armeabi-v7a.apk` | HP 32-bit lama |
+| `Vynora Music-android-x86_64.apk` | Emulator / Chromebook |
+| `Vynora Music-android-universal.apk` | **Bingung? pilih ini** (lebih besar, cocok di semua) |
 
 ---
 
@@ -172,7 +172,7 @@ Jika muncul pesan *"Login otomatis gagal… anonymous sign-ins"* → langkah 6.1
 
 ## 7. Layar login: email & Google
 
-Saat HokTifyy dibuka **pertama kali** (setelah onboarding) muncul layar login dengan tiga pilihan:
+Saat Vynora Music dibuka **pertama kali** (setelah onboarding) muncul layar login dengan tiga pilihan:
 **Email + kata sandi**, **Google**, atau **Lanjutkan sebagai Tamu**. Layar ini tampil sekali; pilihan tamu atau login yang berhasil membuatnya tidak muncul lagi. Layar menyesuaikan ukuran: satu kolom di HP, dua panel di tablet/desktop. Layar ini otomatis dilewati jika `SUPABASE_URL` / `SUPABASE_ANON_KEY` belum diisi.
 
 ### 7.1 Login email (tanpa setup tambahan)
@@ -208,7 +208,7 @@ Pemutar musik dan playlist bersama berjalan **tanpa login Google** (lihat bagian
 
 ### Cara kerja
 1. Setiap build di GitHub otomatis memakai **nomor build yang naik sendiri** (nomor run) dan membuat release baru bertag `v<versi>+<nomor>`. Kamu **tidak perlu** mengedit `pubspec.yaml` untuk tiap build.
-2. Tiap kali HokTifyy dibuka, aplikasi mengecek release terbaru repo kamu.
+2. Tiap kali Vynora Music dibuka, aplikasi mengecek release terbaru repo kamu.
 3. Jika ada yang lebih baru, muncul **pop-up "Pembaruan Tersedia"** berisi catatan perubahan dengan tombol:
    - **Perbarui Langsung** → mengunduh APK di dalam aplikasi lalu membuka installer Android → tekan *Install*.
    - **Web** → membuka halaman repo.
@@ -220,7 +220,7 @@ Pemutar musik dan playlist bersama berjalan **tanpa login Google** (lihat bagian
 - Repo **public** (aplikasi membaca GitHub tanpa login).
 - APK terpasang dibuild dari repo itu (build ini sudah membawa `HOKTIFYY_REPO` otomatis).
 - Build baru ditandatangani **keystore yang sama** (dibuat `setup.sh`), kalau tidak, installer menolak menimpa.
-- Release punya file `HokTifyy-android-universal.apk` (otomatis dibuat workflow).
+- Release punya file `Vynora Music-android-universal.apk` (otomatis dibuat workflow).
 
 ### Merilis update
 ```bash
@@ -237,7 +237,7 @@ bash termux/build.sh
 ```
 
 ### Menguji pop-up
-Pasang APK build lama, jalankan build baru sampai selesai, lalu buka kembali HokTifyy di HP (pastikan internet aktif).
+Pasang APK build lama, jalankan build baru sampai selesai, lalu buka kembali Vynora Music di HP (pastikan internet aktif).
 
 ---
 
@@ -255,7 +255,7 @@ Pasang APK build lama, jalankan build baru sampai selesai, lalu buka kembali Hok
 | `STORE_PASSWORD`, `KEY_PASSWORD`, `KEY_ALIAS` | password & alias keystore |
 
    Tanpa secret keystore, workflow tetap jalan memakai keystore **sementara** (APK tidak bisa di-update menimpa build lama).
-3. Tab **Actions → Build HokTifyy APK → Run workflow**.
+3. Tab **Actions → Build Vynora Music APK → Run workflow**.
 4. Selesai → tab **Releases** → unduh APK → install.
 
 ---
@@ -264,7 +264,7 @@ Pasang APK build lama, jalankan build baru sampai selesai, lalu buka kembali Hok
 
 | Gejala | Solusi |
 |---|---|
-| `termux-open` tidak membuka installer | Buka *Files → Download → HokTifyy-….apk* manual. Izinkan **Install unknown apps** untuk Termux/Files. |
+| `termux-open` tidak membuka installer | Buka *Files → Download → Vynora Music-….apk* manual. Izinkan **Install unknown apps** untuk Termux/Files. |
 | *App not installed* / *conflict* | Ada versi lama dengan tanda-tangan berbeda → uninstall dulu, lalu install. Pakai keystore tetap (langkah 4) agar tidak terulang. |
 | Workflow gagal di *Build APK* | Buka log di tab Actions → salin error. Source ini belum pernah dikompilasi di lingkungan pembuat panduan, jadi build pertama bisa menemukan penyesuaian kecil. |
 | `gh: command not found` | `pkg install gh` |
@@ -280,4 +280,4 @@ Pasang APK build lama, jalankan build baru sampai selesai, lalu buka kembali Hok
 
 ## 11. Lisensi
 
-HokTifyy adalah turunan **StreamBeats** (© 2026 DuskCipher) dengan source oleh **Valora Official**, berlisensi **GNU GPL v2 atau lebih baru**. Berkas [`LICENSE`](LICENSE) dan kredit Valora **tidak boleh dihapus**; rincian perubahan di [`NOTICE.md`](NOTICE.md). Jika membagikan APK ke orang lain, sediakan source code-nya (repo public sudah memenuhi).
+Vynora Music adalah turunan **StreamBeats** (© 2026 DuskCipher) dengan source oleh **Valora Official**, berlisensi **GNU GPL v2 atau lebih baru**. Berkas [`LICENSE`](LICENSE) dan kredit Valora **tidak boleh dihapus**; rincian perubahan di [`NOTICE.md`](NOTICE.md). Jika membagikan APK ke orang lain, sediakan source code-nya (repo public sudah memenuhi).

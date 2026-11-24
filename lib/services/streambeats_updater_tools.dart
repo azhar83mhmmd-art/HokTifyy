@@ -107,7 +107,7 @@ Future<Map<String, dynamic>> getAppUpdates() async {
   try {
     updates = await githubUpdate();
   } catch (e) {
-    // HokTifyy hanya memakai GitHub Releases milik repo sendiri
+    // Vynora Music hanya memakai GitHub Releases milik repo sendiri
     // (SourceForge/upstream StreamBeats tidak dipakai lagi).
     log('GitHub check failed: $e', name: 'UpdaterTools');
     {

@@ -187,8 +187,8 @@ class _LegacyMigrationOverlayState extends State<LegacyMigrationOverlay>
       valueListenable: _phase,
       builder: (context, phase, _) {
         final title = switch (phase) {
-          _Phase.running => 'Upgrading HokTifyy',
-          _Phase.success => 'Welcome to HokTifyy',
+          _Phase.running => 'Upgrading Vynora Music',
+          _Phase.success => 'Welcome to Vynora Music',
           _Phase.failed => 'Migration Aborted',
         };
 
@@ -386,7 +386,7 @@ class _LegacyMigrationOverlayState extends State<LegacyMigrationOverlay>
           elevation: 0,
         ),
         child: Text(
-          isErr ? 'Retry Migration' : 'Enter HokTifyy',
+          isErr ? 'Retry Migration' : 'Enter Vynora Music',
           style: const TextStyle(
               fontSize: 16, fontWeight: FontWeight.w700, letterSpacing: 0.3),
         ),

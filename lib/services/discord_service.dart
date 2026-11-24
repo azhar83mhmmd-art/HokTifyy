@@ -38,7 +38,7 @@ class DiscordService {
               details: track.title,
               state: isPlaying ? "Playing・$artistStr" : "Paused・$artistStr",
               largeImageKey: "streambeatstunes_logo",
-              largeImageText: "HokTifyy",
+              largeImageText: "Vynora Music",
               startTimeStamp: _startTimeStamp),
         );
       } catch (e) {

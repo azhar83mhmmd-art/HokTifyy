@@ -48,7 +48,7 @@ class HomeSidebarDrawer extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Masukan Anda sangat berharga bagi kami untuk mengembangkan HokTifyy.',
+                'Masukan Anda sangat berharga bagi kami untuk mengembangkan Vynora Music.',
                 style: TextStyle(color: Colors.grey, fontSize: 12),
               ),
               const SizedBox(height: 16),
@@ -208,7 +208,7 @@ class HomeSidebarDrawer extends StatelessWidget {
               builder: (context, snapshot) {
                 final user = SupabaseAuthService.currentUser;
                 String displayName = 'Guest';
-                String subtitle = 'HokTifyy Music';
+                String subtitle = 'Vynora Music Music';
                 String? avatarUrl;
 
                 if (user != null && !user.isAnonymous) {
@@ -474,7 +474,7 @@ class HomeSidebarDrawer extends StatelessWidget {
                       final version = snapshot.data?.version ?? '3.2.2';
                       final build = snapshot.data?.buildNumber ?? '3';
                       return Text(
-                        'HokTifyy v$version+$build',
+                        'Vynora Music v$version+$build',
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.35),
                           fontSize: 11,
@@ -556,7 +556,7 @@ class ShareBottomSheet extends StatelessWidget {
   const ShareBottomSheet({super.key});
 
   static const String shareUrl = AppConfig.websiteUrl;
-  static const String shareText = 'Download HokTifyy sekarang! Pemutar musik gratis tanpa iklan: $shareUrl';
+  static const String shareText = 'Download Vynora Music sekarang! Pemutar musik gratis tanpa iklan: $shareUrl';
 
   Future<void> _launchShareUrl(String platform) async {
     Uri? uri;
@@ -565,13 +565,13 @@ class ShareBottomSheet extends StatelessWidget {
         uri = Uri.parse('https://api.whatsapp.com/send?text=${Uri.encodeComponent(shareText)}');
         break;
       case 'telegram':
-        uri = Uri.parse('https://t.me/share/url?url=${Uri.encodeComponent(shareUrl)}&text=${Uri.encodeComponent("Download HokTifyy sekarang! Pemutar musik gratis tanpa iklan!")}');
+        uri = Uri.parse('https://t.me/share/url?url=${Uri.encodeComponent(shareUrl)}&text=${Uri.encodeComponent("Download Vynora Music sekarang! Pemutar musik gratis tanpa iklan!")}');
         break;
       case 'facebook':
         uri = Uri.parse('https://www.facebook.com/sharer/sharer.php?u=${Uri.encodeComponent(shareUrl)}');
         break;
       case 'twitter':
-        uri = Uri.parse('https://twitter.com/intent/tweet?text=${Uri.encodeComponent("Download HokTifyy sekarang! Pemutar musik gratis tanpa iklan!")}&url=${Uri.encodeComponent(shareUrl)}');
+        uri = Uri.parse('https://twitter.com/intent/tweet?text=${Uri.encodeComponent("Download Vynora Music sekarang! Pemutar musik gratis tanpa iklan!")}&url=${Uri.encodeComponent(shareUrl)}');
         break;
     }
 
@@ -638,7 +638,7 @@ class ShareBottomSheet extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Bagikan HokTifyy',
+                    'Bagikan Vynora Music',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,

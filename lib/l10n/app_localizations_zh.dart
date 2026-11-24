@@ -9,7 +9,7 @@ class AppLocalizationsZh extends AppLocalizations {
   AppLocalizationsZh([String locale = 'zh']) : super(locale);
 
   @override
-  String get onboardingTitle => '欢迎使用 HokTifyy';
+  String get onboardingTitle => '欢迎使用 Vynora Music';
 
   @override
   String get onboardingSubtitle => '让我们开始设置您的语言和地区。';
@@ -942,7 +942,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get storageAutoLyricsSubtitle => '播放歌曲时自动保存歌词。';
 
   @override
-  String get storageResetApp => '重置 HokTifyy 应用';
+  String get storageResetApp => '重置 Vynora Music 应用';
 
   @override
   String get storageResetAppSubtitle => '删除所有数据并将应用恢复到初始状态。';
@@ -952,7 +952,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get storageResetConfirmMessage =>
-      '确定要重置 HokTifyy 吗？这将删除您的所有数据且无法撤销。';
+      '确定要重置 Vynora Music 吗？这将删除您的所有数据且无法撤销。';
 
   @override
   String get storageResetButton => '重置';
@@ -1049,7 +1049,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get updateCheckForUpdates => '检查更新';
 
   @override
-  String get updateCheckSubtitle => '查看是否有新版本的 HokTifyy 可用。';
+  String get updateCheckSubtitle => '查看是否有新版本的 Vynora Music 可用。';
 
   @override
   String get updateAutoNotify => '自动更新通知';
@@ -1061,7 +1061,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get updateCheckTitle => '检查更新';
 
   @override
-  String get updateUpToDate => 'HokTifyy🌸 已经是最新版本！';
+  String get updateUpToDate => 'Vynora Music🌸 已经是最新版本！';
 
   @override
   String get updateViewPreRelease => '查看最新预发布版';
@@ -1072,7 +1072,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get updateNewVersionAvailable => 'HokTifyy🌸 新版本现已可用！';
+  String get updateNewVersionAvailable => 'Vynora Music🌸 新版本现已可用！';
 
   @override
   String updateVersion(String ver, String build) {
@@ -1377,13 +1377,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aboutCreativeHighlights => '更新与创作亮点';
 
   @override
-  String get aboutTipQuote => '喜欢 HokTifyy 吗？小小的打赏能让它持续绽放。🌸';
+  String get aboutTipQuote => '喜欢 Vynora Music 吗？小小的打赏能让它持续绽放。🌸';
 
   @override
   String get aboutTipButton => '我要赞赏';
 
   @override
-  String get aboutTipDesc => '我希望 HokTifyy 越来越好。';
+  String get aboutTipDesc => '我希望 Vynora Music 越来越好。';
 
   @override
   String get aboutGitHub => 'GitHub';
@@ -1443,13 +1443,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get songInfoMetadataUnavailable => '此来源不支持刷新元数据';
 
   @override
-  String get songInfoSearchTitle => '在 HokTifyy 中搜索此歌曲';
+  String get songInfoSearchTitle => '在 Vynora Music 中搜索此歌曲';
 
   @override
-  String get songInfoSearchArtist => '在 HokTifyy 中搜索此艺人';
+  String get songInfoSearchArtist => '在 Vynora Music 中搜索此艺人';
 
   @override
-  String get songInfoSearchAlbum => '在 HokTifyy 中搜索此专辑';
+  String get songInfoSearchAlbum => '在 Vynora Music 中搜索此专辑';
 
   @override
   String get eqTitle => '均衡器';
@@ -1526,7 +1526,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get importNoPluginsLoaded => '未加载内容导入插件。\n请安装导入插件以从外部服务导入歌单。';
 
   @override
-  String get importStreamBeatsFiles => '导入 HokTifyy 文件';
+  String get importStreamBeatsFiles => '导入 Vynora Music 文件';
 
   @override
   String get importM3UFiles => '导入 M3U 歌单';
@@ -1545,7 +1545,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get importNoteMessage =>
-      '您只能导入由 HokTifyy 创建的文件。\n如果文件来自其他来源，将无法工作。是否仍要继续？';
+      '您只能导入由 Vynora Music 创建的文件。\n如果文件来自其他来源，将无法工作。是否仍要继续？';
 
   @override
   String get importTitle => '导入';
@@ -1850,7 +1850,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String updateAvailableBody(String ver, String build) {
-    return 'HokTifyy🌸 新版本现已可用！\n\n版本：$ver+$build';
+    return 'Vynora Music🌸 新版本现已可用！\n\n版本：$ver+$build';
   }
 
   @override
@@ -1869,7 +1869,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get pluginBootstrapTitle => '正在设置 HokTifyy';
+  String get pluginBootstrapTitle => '正在设置 Vynora Music';
 
   @override
   String pluginBootstrapProgress(int percent) {
@@ -1884,7 +1884,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get pluginBootstrapErrorBody =>
-      '部分插件无法安装。您仍可使用 HokTifyy —— 插件将在下次启动时重试。';
+      '部分插件无法安装。您仍可使用 Vynora Music —— 插件将在下次启动时重试。';
 
   @override
   String get pluginBootstrapContinue => '仍然继续';

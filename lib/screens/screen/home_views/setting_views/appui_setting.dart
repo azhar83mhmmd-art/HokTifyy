@@ -137,7 +137,7 @@ class _AppUISettingsState extends State<AppUISettings> {
                     SettingToggleTile(
                       icon: MingCute.loading_3_line,
                       title: "Tampilkan Animasi Pembuka",
-                      subtitle: "Tampilkan animasi loading HokTifyy saat aplikasi dibuka (Windows)",
+                      subtitle: "Tampilkan animasi loading Vynora Music saat aplikasi dibuka (Windows)",
                       value: _showSplash,
                       onChanged: (v) async {
                         setState(() {

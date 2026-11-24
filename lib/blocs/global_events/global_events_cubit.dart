@@ -26,15 +26,14 @@ class GlobalEventsCubit extends Cubit<GlobalEventsState> {
       emit(WhatIsNewState(changeLogs: updates['changelogs']));
     }
 
-    if (await _settingsDao.getSettingBool(SettingKeys.autoUpdateNotify) ??
-        true) {
-      if (updates["results"]) {
-        emit(UpdateAvailable(
-          newVersion: updates["newVer"],
-          newBuild: updates["newBuild"],
-          downloadUrl: updates["download_url"] ?? AppConfig.websiteUrl,
-        ));
-      }
+    // Pop up update selalu ditampilkan selama ada versi baru
+    // (tidak lagi bergantung pada toggle "notifikasi update").
+    if (updates["results"] == true) {
+      emit(UpdateAvailable(
+        newVersion: updates["newVer"],
+        newBuild: updates["newBuild"],
+        downloadUrl: updates["download_url"] ?? AppConfig.websiteUrl,
+      ));
     }
   }
 

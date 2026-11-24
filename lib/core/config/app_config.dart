@@ -1,4 +1,4 @@
-// HokTifyy - runtime configuration.
+// Vynora Music - runtime configuration.
 //
 // Semua nilai di sini dikirim saat build lewat --dart-define
 // (GitHub Actions membacanya dari GitHub Secrets), jadi tidak ada
@@ -13,7 +13,7 @@
 class AppConfig {
   AppConfig._();
 
-  static const String appName = 'HokTifyy';
+  static const String appName = 'Vynora Music';
 
   /// Project URL dari Supabase: Settings -> API -> Project URL
   static const String supabaseUrl =

@@ -259,7 +259,7 @@ class DBProvider {
         '_meta': {
           'format': 'legacy-v2-full',
           'exportedAt': DateTime.now().toIso8601String(),
-          'generatedBy': 'HokTifyy DBProvider',
+          'generatedBy': 'Vynora Music DBProvider',
           'playlistsCount': playlistRows.length,
           'mediaItemsCount': mediaRows.length,
         },

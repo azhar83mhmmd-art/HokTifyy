@@ -54,7 +54,7 @@ class PlayerInitializer {
       builder: () => StreamBeatsMusicPlayer(),
       config: const AudioServiceConfig(
         androidNotificationChannelId: 'com.hoktifyy.notification.status',
-        androidNotificationChannelName: 'HokTifyy',
+        androidNotificationChannelName: 'Vynora Music',
         androidNotificationIcon: 'mipmap/ic_launcher',
         androidResumeOnClick: true,
         androidShowNotificationBadge: true,

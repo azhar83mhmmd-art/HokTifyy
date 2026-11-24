@@ -1,5 +1,5 @@
 #!/data/data/com.termux/files/usr/bin/bash
-# Mengunduh APK HokTifyy terbaru dari GitHub Releases lalu membuka installer Android.
+# Mengunduh APK Vynora Music terbaru dari GitHub Releases lalu membuka installer Android.
 # Tidak perlu login untuk repo public.
 # Pakai:  bash termux/install.sh user/repo
 #   atau: curl -fsSL https://raw.githubusercontent.com/USER/REPO/main/termux/install.sh | bash -s -- USER/REPO
