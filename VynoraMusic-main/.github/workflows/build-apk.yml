@@ -1,0 +1,154 @@
+name: "Build Vynora Music APK"
+
+# Cara pakai:
+#   - Manual : tab Actions -> "Build Vynora Music APK" -> Run workflow
+#   - Otomatis: push tag, mis. `git tag v2.0.0+1 && git push --tags`
+# Hasil: APK ada di tab Releases (dan di Artifacts).
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-apk:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Bebaskan ruang disk runner
+        run: |
+          df -h /
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/.ghcup /usr/local/share/boost \
+            /usr/share/swift /opt/hostedtoolcache/CodeQL /usr/local/share/powershell \
+            /usr/local/lib/heroku /opt/microsoft /opt/az /usr/lib/google-cloud-sdk || true
+          docker image prune --all --force >/dev/null 2>&1 || true
+          sudo apt-get clean || true
+          df -h /
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Rust (target Android)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.44.x'   # dikunci: stable terbaru (3.50) tidak cocok dengan AGP 8.9.1 project ini
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Tentukan versi & nomor build
+        run: |
+          full=$(grep -m1 '^version:' pubspec.yaml | awk '{print $2}')
+          VERSION="${full%%+*}"
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            # tag berformat v1.2.3+45
+            t="${GITHUB_REF_NAME#v}"
+            VERSION="${t%%+*}"
+            BUILD="${t##*+}"
+            [ "$BUILD" = "$t" ] && BUILD="${GITHUB_RUN_NUMBER}"
+            TAG="${GITHUB_REF_NAME}"
+          else
+            # build manual: nomor build = nomor run (selalu naik -> pop-up update otomatis muncul)
+            BUILD="${GITHUB_RUN_NUMBER}"
+            TAG="v${VERSION}+${BUILD}"
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "BUILD=$BUILD"     >> "$GITHUB_ENV"
+          echo "TAG=$TAG"         >> "$GITHUB_ENV"
+          echo "Versi: $VERSION+$BUILD  tag: $TAG"
+
+      - name: Setup signing keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          STORE_PASSWORD:  ${{ secrets.STORE_PASSWORD }}
+          KEY_PASSWORD:    ${{ secrets.KEY_PASSWORD }}
+          KEY_ALIAS:       ${{ secrets.KEY_ALIAS }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "Memakai keystore dari GitHub Secrets"
+            echo "$KEYSTORE_BASE64" | base64 -d > android/hoktifyy.jks
+            printf 'storePassword=%s\nkeyPassword=%s\nkeyAlias=%s\nstoreFile=hoktifyy.jks\n' \
+              "$STORE_PASSWORD" "$KEY_PASSWORD" "$KEY_ALIAS" > android/key.properties
+          else
+            echo "::warning::KEYSTORE_BASE64 belum diisi. Membuat keystore SEMENTARA - APK tidak bisa di-update menimpa build sebelumnya. Jalankan termux/setup.sh agar keystore tetap."
+            keytool -genkeypair -v -keystore android/hoktifyy.jks -keyalg RSA -keysize 2048 \
+              -validity 10000 -alias hoktifyy -storepass hoktifyy-temp -keypass hoktifyy-temp \
+              -dname "CN=Vynora Music, OU=Mobile, O=Vynora Music, C=ID"
+            printf 'storePassword=hoktifyy-temp\nkeyPassword=hoktifyy-temp\nkeyAlias=hoktifyy\nstoreFile=hoktifyy.jks\n' > android/key.properties
+          fi
+
+      - name: Build APK
+        env:
+          SUPABASE_URL:          ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY:     ${{ secrets.SUPABASE_ANON_KEY }}
+          GOOGLE_WEB_CLIENT_ID:  ${{ secrets.GOOGLE_WEB_CLIENT_ID }}
+        run: |
+          flutter build apk --release --android-skip-build-dependency-validation \
+            --build-name="$VERSION" --build-number="$BUILD" \
+            --dart-define=SUPABASE_URL="$SUPABASE_URL" \
+            --dart-define=SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY" \
+            --dart-define=GOOGLE_WEB_CLIENT_ID="$GOOGLE_WEB_CLIENT_ID" \
+            --dart-define=HOKTIFYY_REPO="${{ github.repository }}"
+
+      - name: Rename APK files
+        run: |
+          cd build/app/outputs/flutter-apk
+          ls -la
+          mkdir -p ../../../../dist
+          for abi in arm64-v8a armeabi-v7a x86_64; do
+            [ -f "app-${abi}-release.apk" ] && cp "app-${abi}-release.apk" "../../../../dist/VynoraMusic-android-${abi}.apk"
+          done
+          if [ -f app-universal-release.apk ]; then
+            cp app-universal-release.apk ../../../../dist/VynoraMusic-android-universal.apk
+          elif [ -f app-release.apk ]; then
+            cp app-release.apk ../../../../dist/VynoraMusic-android-universal.apk
+          fi
+          ls -la ../../../../dist
+
+      - name: Verify APK signature
+        run: |
+          APKSIGNER=$(ls -d "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -n1)
+          for f in dist/*.apk; do
+            echo "== $f"
+            "$APKSIGNER" verify --verbose "$f" | head -5
+          done
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: VynoraMusic-apk
+          path: dist/*.apk
+          if-no-files-found: error
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          NOTES="Vynora Music ${VERSION} (build ${BUILD}). Pilih APK sesuai HP: arm64-v8a untuk HP modern, universal bila ragu."
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" dist/*.apk --clobber
+          else
+            gh release create "$TAG" dist/*.apk --target "$GITHUB_SHA" --title "Vynora Music $TAG" --notes "$NOTES"
+          fi

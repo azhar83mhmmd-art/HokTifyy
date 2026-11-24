@@ -1,0 +1,751 @@
+import 'dart:developer';
+import 'package:streambeats/blocs/explore/cubit/explore_cubits.dart';
+import 'package:streambeats/blocs/internet_connectivity/cubit/connectivity_cubit.dart';
+import 'package:streambeats/blocs/lastdotfm/lastdotfm_cubit.dart';
+import 'package:streambeats/blocs/media_player/streambeats_player_cubit.dart';
+import 'package:streambeats/blocs/notification/notification_cubit.dart';
+import 'package:streambeats/blocs/settings_cubit/cubit/settings_cubit.dart';
+import 'package:streambeats/core/di/service_locator.dart';
+import 'package:streambeats/core/models/exported.dart';
+import 'package:streambeats/core/models/media_playlist_model.dart';
+import 'package:streambeats/plugins/blocs/content/content_bloc.dart';
+import 'package:streambeats/plugins/blocs/content/content_event.dart';
+import 'package:streambeats/plugins/blocs/content/content_state.dart';
+import 'package:streambeats/plugins/blocs/plugin/plugin_bloc.dart';
+import 'package:streambeats/plugins/blocs/plugin/plugin_state.dart';
+import 'package:streambeats/screens/screen/home_views/recents_view.dart';
+import 'package:streambeats/screens/screen/home_views/setting_views/about.dart';
+import 'package:streambeats/screens/widgets/more_bottom_sheet.dart';
+import 'package:streambeats/screens/widgets/sign_board_widget.dart';
+import 'package:streambeats/screens/widgets/song_tile.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flutter/material.dart';
+import 'package:streambeats/screens/screen/home_views/notification_view.dart';
+import 'package:streambeats/screens/screen/home_views/setting_view.dart';
+import 'package:streambeats/screens/screen/home_views/timer_view.dart';
+import 'package:streambeats/core/theme/app_theme.dart';
+import 'package:streambeats/l10n/app_localizations.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:iconsx_plus/iconsx_plus.dart';
+import 'chart/carousal_widget.dart';
+import '../widgets/horizontal_card_view.dart';
+import '../widgets/hok_mix_card.dart';
+import '../widgets/tab_list_widget.dart';
+import 'package:streambeats/screens/widgets/global_footer.dart';
+import 'package:streambeats/services/supabase_auth_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:streambeats/services/update_service.dart';
+import 'package:streambeats/screens/widgets/search_result_widgets.dart';
+import 'package:badges/badges.dart' as badges;
+
+class ExploreScreen extends StatefulWidget {
+  const ExploreScreen({super.key});
+  @override
+  State<ExploreScreen> createState() => _ExploreScreenState();
+}
+
+class _ExploreScreenState extends State<ExploreScreen> {
+  bool isUpdateChecked = false;
+  late final ContentBloc _homeContentBloc;
+  Future<List<Track>> lFMData = Future.value(const []);
+
+  @override
+  void initState() {
+    super.initState();
+    _homeContentBloc = ContentBloc(pluginService: ServiceLocator.pluginService);
+    _tryLoadHomeSections();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      UpdateService.checkUpdate(context);
+    });
+  }
+
+  void _tryLoadHomeSections() {
+    final settingsState = context.read<SettingsCubit>().state;
+    if (!settingsState.settingsReady) return;
+
+    final pluginState = context.read<PluginBloc>().state;
+    final contentResolvers = pluginState.loadedContentResolvers;
+    if (contentResolvers.isEmpty) return;
+
+    final preferredId = settingsState.homePluginId;
+    if (preferredId.isNotEmpty) {
+      final isAlreadyLoaded =
+          contentResolvers.any((p) => p.manifest.id == preferredId);
+      if (!isAlreadyLoaded) {
+        final isInstalled = pluginState.availablePlugins
+            .any((p) => p.manifest.id == preferredId);
+        if (isInstalled) return; // Preferred plugin is loading — wait for it
+      }
+    }
+
+    final pluginId = _effectiveHomePluginId(contentResolvers);
+
+    if (_homeContentBloc.state.activePluginId == pluginId &&
+        _homeContentBloc.state.homeSections != null) {
+      return;
+    }
+
+    _homeContentBloc.add(GetHomeSections(pluginId: pluginId));
+  }
+
+  String _effectiveHomePluginId(List<dynamic> loadedResolvers) {
+    final preferredId = context.read<SettingsCubit>().state.homePluginId;
+    final hasPreferred = preferredId.isNotEmpty &&
+        loadedResolvers.any((plugin) => plugin.manifest.id == preferredId);
+    return hasPreferred ? preferredId : loadedResolvers.first.manifest.id;
+  }
+
+  @override
+  void dispose() {
+    _homeContentBloc.close();
+    super.dispose();
+  }
+
+  Future<List<Track>> fetchLFMPicks(bool state, BuildContext ctx) async {
+    if (state) {
+      try {
+        final data = await lFMData;
+        if (data.isNotEmpty) return data;
+        if (ctx.mounted) {
+          final pluginState = ctx.read<PluginBloc>().state;
+          final priority = ctx.read<SettingsCubit>().state.resolverPriority;
+          final allIds = pluginState.loadedContentResolvers
+              .map((p) => p.manifest.id)
+              .toList();
+          final resolverIds = [
+            ...priority.where(allIds.contains),
+            ...allIds.where((id) => !priority.contains(id)),
+          ];
+          lFMData = ctx.read<LastdotfmCubit>().getRecommendedTracks(
+                resolverPluginIds: resolverIds,
+              );
+        }
+        return (await lFMData);
+      } catch (e) {
+        log(e.toString(), name: "ExploreScreen");
+      }
+    }
+    return const [];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: MultiBlocListener(
+        listeners: [
+          BlocListener<SettingsCubit, SettingsState>(
+            listenWhen: (previous, current) =>
+                previous.homePluginId != current.homePluginId ||
+                (!previous.settingsReady && current.settingsReady),
+            listener: (context, state) {
+              _homeContentBloc.add(const ClearHomeSections());
+              _tryLoadHomeSections();
+            },
+          ),
+          BlocListener<PluginBloc, PluginState>(
+            listenWhen: (previous, current) {
+              return previous.loadedContentResolvers !=
+                      current.loadedContentResolvers ||
+                  previous.loadedPluginIds != current.loadedPluginIds;
+            },
+            listener: (context, state) {
+              if (state.loadedContentResolvers.isEmpty) {
+                _homeContentBloc.add(const ClearHomeSections());
+                return;
+              }
+
+              final activePluginId = _homeContentBloc.state.activePluginId;
+              if (activePluginId != null &&
+                  !state.loadedPluginIds.contains(activePluginId)) {
+                _homeContentBloc.add(const ClearHomeSections());
+                _tryLoadHomeSections();
+                return;
+              }
+
+              _tryLoadHomeSections();
+            },
+          ),
+        ],
+        child: Scaffold(
+          body: RefreshIndicator(
+            onRefresh: () async {
+              final pluginId = _effectiveHomePluginId(
+                context.read<PluginBloc>().state.loadedContentResolvers,
+              );
+              _homeContentBloc.add(
+                GetHomeSections(pluginId: pluginId, bypassCache: true),
+              );
+            },
+            child: CustomScrollView(
+              shrinkWrap: true,
+              physics: const ClampingScrollPhysics(),
+              slivers: [
+                const CustomDiscoverBar(),
+                SliverList(
+                  delegate: SliverChildListDelegate(
+                    [
+                      BlocBuilder<RecentlyCubit, RecentlyCubitState>(
+                        builder: (context, state) =>
+                            HokDailyMixCard(tracks: state.tracks),
+                      ),
+                      const CaraouselWidget(),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 15.0),
+                        child: SizedBox(
+                          child: BlocBuilder<RecentlyCubit, RecentlyCubitState>(
+                            builder: (context, state) {
+                              if (state is RecentlyCubitInitial) {
+                                return const Center(
+                                  child: SizedBox(
+                                    height: 60,
+                                    width: 60,
+                                    child: CircularProgressIndicator(
+                                      color: Default_Theme.accentColor2,
+                                    ),
+                                  ),
+                                );
+                              }
+                              if (state.tracks.isNotEmpty) {
+                                return HomeTrackSection(
+                                  title: AppLocalizations.of(context)!
+                                      .exploreRecently,
+                                  tracks: state.tracks,
+                                  playAllLabel: 'Putar Semua',
+                                  onTitleTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const HistoryView(),
+                                    ),
+                                  ),
+                                  onTrackTap: (i) => context
+                                      .read<StreamBeatsPlayerCubit>()
+                                      .streambeatsPlayer
+                                      .loadPlaylist(
+                                        Playlist(
+                                          tracks: state.tracks,
+                                          title: 'Recently',
+                                        ),
+                                        idx: i,
+                                        doPlay: true,
+                                      ),
+                                  onPlayAll: () => context
+                                      .read<StreamBeatsPlayerCubit>()
+                                      .streambeatsPlayer
+                                      .loadPlaylist(
+                                        Playlist(
+                                          tracks: state.tracks,
+                                          title: 'Recently',
+                                        ),
+                                        idx: 0,
+                                        doPlay: true,
+                                      ),
+                                );
+                              }
+                              return const SizedBox();
+                            },
+                          ),
+                        ),
+                      ),
+                      BlocBuilder<SettingsCubit, SettingsState>(
+                        builder: (context, state) {
+                          if (state.lFMPicks) {
+                            return FutureBuilder(
+                              future: fetchLFMPicks(state.lFMPicks, context),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData &&
+                                    (snapshot.data?.isNotEmpty ?? false)) {
+                                  final picks = snapshot.data!;
+                                  Playlist pl() => Playlist(
+                                      tracks: picks, title: 'Last.Fm Picks');
+                                  return HomeTrackSection(
+                                    title: AppLocalizations.of(context)!
+                                        .exploreLastFmPicks,
+                                    tracks: picks,
+                                    onTrackTap: (i) => context
+                                        .read<StreamBeatsPlayerCubit>()
+                                        .streambeatsPlayer
+                                        .loadPlaylist(pl(),
+                                            idx: i, doPlay: true),
+                                    onPlayAll: () => context
+                                        .read<StreamBeatsPlayerCubit>()
+                                        .streambeatsPlayer
+                                        .loadPlaylist(pl(),
+                                            idx: 0, doPlay: true),
+                                  );
+                                }
+                                return const SizedBox.shrink();
+                              },
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        },
+                      ),
+                      BlocBuilder<ContentBloc, ContentState>(
+                        bloc: _homeContentBloc,
+                        builder: (context, state) {
+                          final loadedResolvers = context
+                              .read<PluginBloc>()
+                              .state
+                              .loadedContentResolvers;
+                          if (loadedResolvers.isEmpty) {
+                            return const SignBoardWidget(
+                              message:
+                                  'No content plugin loaded.\nLoad a Content Resolver in Plugin Manager.',
+                              icon: MingCute.plugin_2_line,
+                            );
+                          }
+
+                          final sections = state.homeSections ?? const [];
+                          final hasSections = sections.isNotEmpty;
+                          final activePluginId = state.activePluginId;
+                          if (activePluginId != null &&
+                              !context
+                                  .read<PluginBloc>()
+                                  .state
+                                  .loadedPluginIds
+                                  .contains(activePluginId) &&
+                              !hasSections) {
+                            return const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              child: SignBoardWidget(
+                                message:
+                                    'Refreshing Discover source...\nThe previous source is no longer available.',
+                                icon: MingCute.warning_line,
+                              ),
+                            );
+                          }
+
+                          if (state.homeSectionsStatus ==
+                              DetailStatus.loading) {
+                            if (hasSections) {
+                              return _HomeSectionsList(
+                                sections: sections,
+                                contentBloc: _homeContentBloc,
+                                state: state,
+                              );
+                            }
+
+                            return BlocBuilder<ConnectivityCubit,
+                                ConnectivityState>(
+                              builder: (context, connState) {
+                                if (connState ==
+                                    ConnectivityState.disconnected) {
+                                  return const Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 16),
+                                    child: SignBoardWidget(
+                                      message: 'No Internet Connection!',
+                                      icon: MingCute.wifi_off_line,
+                                    ),
+                                  );
+                                }
+
+                                return const Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 40),
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                      color: Default_Theme.accentColor2,
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          }
+
+                          if (state.homeSectionsStatus == DetailStatus.error) {
+                            if (hasSections) {
+                              return _HomeSectionsList(
+                                sections: sections,
+                                contentBloc: _homeContentBloc,
+                                state: state,
+                              );
+                            }
+
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              child: SignBoardWidget(
+                                message: state.error ??
+                                    'Failed to load home sections.',
+                                icon: MingCute.sweats_line,
+                              ),
+                            );
+                          }
+
+                          if (!hasSections) {
+                            return const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 8),
+                              child: SizedBox.shrink(),
+                            );
+                          }
+
+                          return _HomeSectionsList(
+                            sections: sections,
+                            contentBloc: _homeContentBloc,
+                            state: state,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          backgroundColor: Default_Theme.themeColor,
+        ),
+      ),
+    );
+  }
+}
+
+class _HomeSectionsList extends StatelessWidget {
+  final List<Section> sections;
+  final ContentBloc contentBloc;
+  final ContentState state;
+
+  const _HomeSectionsList({
+    required this.sections,
+    required this.contentBloc,
+    required this.state,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      shrinkWrap: true,
+      padding: const EdgeInsets.only(top: 0),
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: sections.length,
+      itemBuilder: (context, index) {
+        final section = sections[index];
+        return HorizontalCardView(
+          section: section,
+          pluginId: contentBloc.state.activePluginId ?? '',
+          canLoadMore: section.moreLink != null,
+          isLoadingMore: state.isHomeSectionLoading(section.id),
+          onLoadMore: section.moreLink == null
+              ? null
+              : () {
+                  contentBloc.add(
+                    LoadMoreHomeSectionItems(
+                      pluginId: contentBloc.state.activePluginId ?? '',
+                      sectionId: section.id,
+                      moreLink: section.moreLink!,
+                    ),
+                  );
+                },
+        );
+      },
+    );
+  }
+}
+
+class CustomDiscoverBar extends StatelessWidget {
+  const CustomDiscoverBar({super.key});
+
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'Selamat Pagi';
+    if (hour < 15) return 'Selamat Siang';
+    if (hour < 18) return 'Selamat Sore';
+    return 'Selamat Malam';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverAppBar(
+      pinned: true,
+      floating: false,
+      snap: false,
+      surfaceTintColor: Default_Theme.themeColor,
+      backgroundColor: Default_Theme.themeColor,
+      automaticallyImplyLeading: false,
+      toolbarHeight: 76,
+      bottom: const _HomeSearchBar(),
+      titleSpacing: 20,
+      title: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _getGreeting(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.4,
+                    color: Default_Theme.accentColor2,
+                  ),
+                ),
+                const Text(
+                  'Beranda',
+                  style: TextStyle(
+                    fontSize: 32,
+                    height: 1.1,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -1,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const TimerIcon(),
+          const NotificationIcon(),
+          const SizedBox(width: 6),
+          // Avatar → Sidebar Drawer
+          StreamBuilder<AuthState>(
+            stream: SupabaseAuthService.authStateChanges,
+            builder: (context, snapshot) {
+              final user = SupabaseAuthService.currentUser;
+              String initials = 'HT';
+              if (user != null && !user.isAnonymous) {
+                final meta = user.userMetadata ?? {};
+                final name = (meta['full_name'] ?? user.email ?? 'U').toString();
+                final parts =
+                    name.split(RegExp(r'[\s@._-]+')).where((e) => e.isNotEmpty);
+                initials = parts.take(2).map((e) => e[0].toUpperCase()).join();
+                if (initials.isEmpty) initials = 'U';
+              }
+              return GestureDetector(
+                onTap: () =>
+                    GlobalFooter.scaffoldKey.currentState?.openDrawer(),
+                child: Container(
+                  width: 44,
+                  height: 44,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Default_Theme.primaryContainerColor,
+                    border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.18), width: 1.5),
+                  ),
+                  child: Text(
+                    initials,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: Default_Theme.onPrimaryContainerColor,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Search bar widget shown below the app bar on the home screen.
+class _HomeSearchBar extends StatelessWidget implements PreferredSizeWidget {
+  const _HomeSearchBar();
+
+  @override
+  Size get preferredSize => const Size.fromHeight(64);
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+      child: Row(
+        children: [
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                context.go('/Search');
+              },
+              child: Container(
+                height: 52,
+                decoration: BoxDecoration(
+                  color: Default_Theme.surfaceHighColor,
+                  borderRadius: BorderRadius.circular(26),
+                  border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.08)),
+                ),
+                child: Row(
+                  children: [
+                    const SizedBox(width: 14),
+                    const Icon(
+                      MingCute.search_2_line,
+                      color: Default_Theme.primaryColor2,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      l10n.searchHintExplore,
+                      style: Default_Theme.primaryTextStyle.merge(
+                        const TextStyle(
+                          fontSize: 14,
+                          color: Default_Theme.primaryColor2,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          // Filter icon
+          Container(
+            height: 52,
+            width: 52,
+            decoration: const BoxDecoration(
+              color: Default_Theme.primaryContainerColor,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              MingCute.filter_line,
+              color: Default_Theme.onPrimaryContainerColor,
+              size: 22,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class NotificationIcon extends StatelessWidget {
+  const NotificationIcon({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<NotificationCubit, NotificationState>(
+      builder: (context, state) {
+        if (state is NotificationInitial || state.notifications.isEmpty) {
+          return IconButton(
+            padding: const EdgeInsets.all(5),
+            constraints: const BoxConstraints(),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NotificationView(),
+                ),
+              );
+            },
+            icon: const Icon(
+              MingCute.notification_line,
+              color: Default_Theme.primaryColor1,
+              size: 30.0,
+            ),
+          );
+        }
+        return badges.Badge(
+          badgeContent: Padding(
+            padding: const EdgeInsets.all(1.5),
+            child: Text(
+              state.notifications.length.toString(),
+              style: Default_Theme.primaryTextStyle.merge(
+                const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: Default_Theme.primaryColor2,
+                ),
+              ),
+            ),
+          ),
+          badgeStyle: const badges.BadgeStyle(
+            badgeColor: Default_Theme.accentColor2,
+            shape: badges.BadgeShape.circle,
+          ),
+          position: badges.BadgePosition.topEnd(top: -10, end: -5),
+          child: IconButton(
+            padding: const EdgeInsets.all(5),
+            constraints: const BoxConstraints(),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NotificationView(),
+                ),
+              );
+            },
+            icon: const Icon(
+              MingCute.notification_line,
+              color: Default_Theme.primaryColor1,
+              size: 30.0,
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class TimerIcon extends StatelessWidget {
+  const TimerIcon({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      padding: const EdgeInsets.all(5),
+      constraints: const BoxConstraints(),
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const TimerView()),
+        );
+      },
+      icon: const Icon(
+        MingCute.stopwatch_line,
+        color: Default_Theme.primaryColor1,
+        size: 30.0,
+      ),
+    );
+  }
+}
+
+class SettingsIcon extends StatelessWidget {
+  const SettingsIcon({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      padding: const EdgeInsets.all(5),
+      constraints: const BoxConstraints(),
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const SettingsView()),
+        );
+      },
+      icon: const Icon(
+        MingCute.settings_3_line,
+        color: Default_Theme.primaryColor1,
+        size: 30.0,
+      ),
+    );
+  }
+}
+
+class SiteIcon extends StatelessWidget {
+  const SiteIcon({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      padding: const EdgeInsets.all(5),
+      constraints: const BoxConstraints(),
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const About()),
+        );
+      },
+      icon: const Icon(
+        MingCute.flower_4_fill,
+        color: Default_Theme.primaryColor1,
+        size: 28.0,
+      ),
+    );
+  }
+}
