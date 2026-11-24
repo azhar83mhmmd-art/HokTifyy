@@ -22,6 +22,7 @@ import 'package:streambeats/plugins/blocs/plugin/plugin_bloc.dart';
 import 'package:streambeats/plugins/blocs/plugin/plugin_state.dart';
 import 'package:streambeats/screens/screen/home_views/setting_view.dart';
 import 'package:streambeats/screens/screen/search/vibes_browse.dart';
+import 'package:streambeats/screens/screen/search/search_results_widgets.dart';
 import 'package:streambeats/screens/widgets/album_card.dart';
 import 'package:streambeats/screens/widgets/artist_card.dart';
 import 'package:streambeats/screens/widgets/more_bottom_sheet.dart';
@@ -96,6 +97,18 @@ class _SearchScreenState extends State<SearchScreen> {
     if (widget.searchQuery.isNotEmpty) {
       _textEditingController.text = widget.searchQuery;
       _doSearch(widget.searchQuery);
+    }
+  }
+
+  /// Layar Search tetap hidup di tab; bila rute dibuka lagi dengan kueri baru
+  /// (mis. dari chip suasana di beranda), jalankan pencarian tersebut.
+  @override
+  void didUpdateWidget(covariant SearchScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.searchQuery.isNotEmpty &&
+        widget.searchQuery != oldWidget.searchQuery) {
+      _textEditingController.text = widget.searchQuery;
+      _doSearchInAllCategories(widget.searchQuery);
     }
   }
 
@@ -699,57 +712,57 @@ class _AestheticFilterChipsSliver extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = SearchTexts.of(context);
     return SliverToBoxAdapter(
       child: ValueListenableBuilder<ContentSearchFilter>(
         valueListenable: filterNotifier,
         builder: (context, filterValue, child) {
           return SizedBox(
-            height: 42,
+            height: 52,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               physics: const BouncingScrollPhysics(),
               itemCount: ContentSearchFilter.values.length,
-              separatorBuilder: (context, index) => const SizedBox(width: 8),
+              separatorBuilder: (context, index) => const SizedBox(width: 10),
               itemBuilder: (context, index) {
                 final e = ContentSearchFilter.values[index];
                 final isSelected = filterValue == e;
-                final displayName =
-                    e.name[0].toUpperCase() + e.name.substring(1);
 
-                return InkWell(
-                  borderRadius: BorderRadius.circular(20),
-                  splashColor: Colors.transparent,
-                  highlightColor: Colors.transparent,
+                return GestureDetector(
+                  behavior: HitTestBehavior.opaque,
                   onTap: () {
+                    HapticFeedback.selectionClick();
                     filterNotifier.value = e;
                     if (textEditingController.text.isNotEmpty) onFilterTapped();
                   },
                   child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    curve: Curves.easeOut,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    duration: const Duration(milliseconds: 220),
+                    curve: Curves.easeOutCubic,
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: isSelected
                           ? Default_Theme.accentColor2
-                          : Default_Theme.primaryColor2.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(20),
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(999),
                       border: Border.all(
-                          color: isSelected
-                              ? Default_Theme.accentColor2
-                              : Colors.white.withValues(alpha: 0.05)),
+                        color: isSelected
+                            ? Default_Theme.accentColor2
+                            : Colors.white.withValues(alpha: 0.22),
+                        width: 1.2,
+                      ),
                     ),
                     child: Text(
-                      displayName,
-                      style: Default_Theme.secondoryTextStyleMedium.copyWith(
+                      t.filterLabel(e.name),
+                      style: TextStyle(
                         color: isSelected
                             ? const Color(0xFF2E1A66)
                             : Default_Theme.primaryColor1
-                                .withValues(alpha: 0.8),
-                        fontSize: 13,
+                                .withValues(alpha: 0.92),
+                        fontSize: 15,
                         fontWeight:
-                            isSelected ? FontWeight.w700 : FontWeight.w500,
+                            isSelected ? FontWeight.w800 : FontWeight.w600,
                       ),
                     ),
                   ),
@@ -998,10 +1011,13 @@ class _SuggestionsSliver extends StatelessWidget {
         }
 
         if (state is SearchSuggestionLoaded) {
-          final dbList =
-              state.dbSuggestionList.map((e) => e.values.first).toList();
-          final apiList = state.suggestionList;
-          final entityList = state.entitySuggestionList;
+          // Dibatasi agar panel saran ringkas seperti dropdown Sonara.
+          final dbList = state.dbSuggestionList
+              .map((e) => e.values.first)
+              .take(3)
+              .toList();
+          final apiList = state.suggestionList.take(6).toList();
+          final entityList = state.entitySuggestionList.take(3).toList();
           final isPluginLoading = state.isPluginLoading;
 
           final combined = <({String query, ContentSearchFilter filter})>[
@@ -1048,68 +1064,77 @@ class _SuggestionsSliver extends StatelessWidget {
                     icon: MingCute.ghost_line));
           }
 
-          final children = <Widget>[
-            const SizedBox(height: 12),
-            if (dbList.isNotEmpty) ...[
-              _buildSuggestionSectionHeader('Recent', MingCute.history_line),
-              ...dbList.asMap().entries.map((e) => _SuggestionTile(
-                    suggestion: e.value,
-                    icon: MingCute.history_line,
-                    isHistory: true,
-                    globalIndex: e.key,
-                    highlightedIndexNotifier: highlightedIndexNotifier,
-                    onSearch: onSearchInAllCategories,
-                    onPopulate: onSetSearchFieldText,
-                  )),
-              const SizedBox(height: 12),
-            ],
-            if (isPluginLoading) ...[
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(99),
-                  child: LinearProgressIndicator(
-                    minHeight: 2,
-                    color: Default_Theme.accentColor2.withValues(alpha: 0.7),
-                    backgroundColor:
-                        Default_Theme.primaryColor1.withValues(alpha: 0.06),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-            ],
-            if (apiList.isNotEmpty) ...[
-              _buildSuggestionSectionHeader(
-                  'Suggestions', MingCute.search_2_line),
-              ...apiList.asMap().entries.map((e) => _SuggestionTile(
-                    suggestion: e.value,
-                    icon: MingCute.search_line,
-                    isHistory: false,
-                    globalIndex: e.key + dbList.length,
-                    highlightedIndexNotifier: highlightedIndexNotifier,
-                    onSearch: onSearchInAllCategories,
-                    onPopulate: onSetSearchFieldText,
-                  )),
-              const SizedBox(height: 12),
-            ],
-            if (entityList.isNotEmpty) ...[
-              _buildSuggestionSectionHeader(
-                  'Top Results', MingCute.sparkles_2_line),
-              ...entityList.asMap().entries.map((e) => _EntitySuggestionTile(
-                    entity: e.value,
-                    globalIndex: e.key + dbList.length + apiList.length,
-                    filter: _filterForEntity(e.value.kind),
-                    query: _buildEntitySearchQuery(e.value),
-                    highlightedIndexNotifier: highlightedIndexNotifier,
-                    onSearch: onSearchWithFilter,
-                  )),
-            ],
-            const SizedBox(height: 120),
+          final tiles = <Widget>[
+            ...dbList.asMap().entries.map((e) => _SuggestionTile(
+                  suggestion: e.value,
+                  icon: MingCute.history_line,
+                  isHistory: true,
+                  globalIndex: e.key,
+                  highlightedIndexNotifier: highlightedIndexNotifier,
+                  onSearch: onSearchInAllCategories,
+                  onPopulate: onSetSearchFieldText,
+                )),
+            ...apiList.asMap().entries.map((e) => _SuggestionTile(
+                  suggestion: e.value,
+                  icon: MingCute.search_line,
+                  isHistory: false,
+                  globalIndex: e.key + dbList.length,
+                  highlightedIndexNotifier: highlightedIndexNotifier,
+                  onSearch: onSearchInAllCategories,
+                  onPopulate: onSetSearchFieldText,
+                )),
+            ...entityList.asMap().entries.map((e) => _EntitySuggestionTile(
+                  entity: e.value,
+                  globalIndex: e.key + dbList.length + apiList.length,
+                  filter: _filterForEntity(e.value.kind),
+                  query: _buildEntitySearchQuery(e.value),
+                  highlightedIndexNotifier: highlightedIndexNotifier,
+                  onSearch: onSearchWithFilter,
+                )),
           ];
 
-          return SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              sliver: SliverList(delegate: SliverChildListDelegate(children)));
+          // Satu kartu dropdown membulat (gaya Sonara).
+          return SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 120),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF16161B),
+                  borderRadius: BorderRadius.circular(26),
+                  border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.08), width: 1),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.5),
+                      blurRadius: 28,
+                      offset: const Offset(0, 14),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (isPluginLoading)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(18, 2, 18, 6),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(99),
+                          child: LinearProgressIndicator(
+                            minHeight: 2,
+                            color:
+                                Default_Theme.accentColor2.withValues(alpha: 0.7),
+                            backgroundColor: Default_Theme.primaryColor1
+                                .withValues(alpha: 0.06),
+                          ),
+                        ),
+                      ),
+                    ...tiles,
+                  ],
+                ),
+              ),
+            ),
+          );
         }
         return SliverFillRemaining(
             hasScrollBody: false,
@@ -1458,6 +1483,10 @@ class _SliverSearchResults extends StatelessWidget {
     }
 
     final pluginId = activePluginNotifier.value ?? '';
+    final texts = SearchTexts.of(context);
+    final queryTitle = state.searchQuery.trim();
+    final showTopResult = state.searchFilter == ContentSearchFilter.all ||
+        state.searchFilter == ContentSearchFilter.track;
     final isLoadingMore = state.searchStatus == SearchStatus.loadingMore;
     final isRefreshing = state.searchStatus == SearchStatus.loading;
 
@@ -1495,31 +1524,31 @@ class _SliverSearchResults extends StatelessWidget {
             ),
           ),
         if (tracks.isNotEmpty) ...[
-          _sliverSectionHeader(AppLocalizations.of(context)!.searchTracks),
-          SliverPadding(
-            padding: const EdgeInsets.only(bottom: 12),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final track = tracks[index];
-                  return Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-                    child: SongCardWidget(
-                      song: track,
-                      onTap: () => context
-                          .read<StreamBeatsPlayerCubit>()
-                          .streambeatsPlayer
-                          .updateQueueTracks([track], doPlay: true),
-                      onOptionsTap: () => showMoreBottomSheet(context, track,
-                          showSinglePlay: true),
-                    ),
-                  );
-                },
-                childCount: tracks.length,
+          if (showTopResult) ...[
+            SliverToBoxAdapter(
+              child: SearchSectionHeader(title: texts.topResult),
+            ),
+            SliverToBoxAdapter(
+              child: SearchTopResultCard(
+                track: tracks.first,
+                queue: tracks,
+                queueTitle: queryTitle,
+              ),
+            ),
+          ],
+          SliverToBoxAdapter(
+            child: SearchSectionHeader(
+              title: queryTitle.isEmpty
+                  ? AppLocalizations.of(context)!.searchTracks
+                  : texts.songsFor(queryTitle),
+              trailing: SearchPlayAllButton(
+                tracks: tracks,
+                queueTitle: queryTitle.isEmpty ? 'Search' : queryTitle,
               ),
             ),
           ),
+          SearchTrackGroupSliver(tracks: tracks),
+          const SliverPadding(padding: EdgeInsets.only(bottom: 6)),
         ],
         if (albums.isNotEmpty) ...[
           _sliverSectionHeader(AppLocalizations.of(context)!.searchAlbums),
@@ -1553,18 +1582,7 @@ class _SliverSearchResults extends StatelessWidget {
   }
 
   Widget _sliverSectionHeader(String title) {
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.only(left: 20, top: 20, bottom: 12),
-        child: Text(
-          title,
-          style: Default_Theme.secondoryTextStyleMedium.merge(TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: Default_Theme.primaryColor1.withValues(alpha: 0.9))),
-        ),
-      ),
-    );
+    return SliverToBoxAdapter(child: SearchSectionHeader(title: title));
   }
 
   Widget _buildResponsiveGrid(List<Widget> children) {

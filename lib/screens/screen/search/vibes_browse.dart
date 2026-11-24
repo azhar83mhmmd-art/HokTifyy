@@ -29,6 +29,32 @@ class SearchTexts {
       _t('Cari lagu, artis, album...', 'Search songs, artists, albums...');
   String get backToVibes => _t('Kembali ke Getaran', 'Back to Vibes');
   String get sources => _t('SUMBER', 'SOURCES');
+
+  // --- Hasil pencarian bergaya Sonara ---
+  String get topResult => _t('Hasil Teratas', 'Top Result');
+  String get playNow => _t('Mainkan Sekarang', 'Play Now');
+  String get radio => 'Radio';
+  String get playAll => _t('Putar Semua', 'Play All');
+  String songsFor(String q) =>
+      _t('Lagu-lagu untuk \u201C$q\u201D', 'Songs for \u201C$q\u201D');
+
+  /// Label chip filter. [name] = nama enum ContentSearchFilter.
+  String filterLabel(String name) {
+    switch (name) {
+      case 'all':
+        return _t('Semua', 'All');
+      case 'track':
+        return _t('Lagu', 'Songs');
+      case 'album':
+        return 'Album';
+      case 'artist':
+        return _t('Artis', 'Artists');
+      case 'playlist':
+        return 'Playlist';
+      default:
+        return name;
+    }
+  }
 }
 
 class _VibeSpec {

@@ -1,5 +1,18 @@
 # Changelog HokTifyy
 
+## [2.1.0] - 2026-11-24
+
+### Fixed
+- **Menu Import Playlist terpotong/terhalang** di tab Perpustakaan: judul besar dan empat tombol ada dalam satu baris sehingga tombol import terdorong keluar layar. Tombol kini ada di `actions` AppBar (ukuran kompak) dan judul otomatis mengecil, jadi keempat tombol (cari, buat, gabung, import) selalu terlihat.
+
+### Changed
+- **Pop-up update muncul terus** selama versi terpasang lebih lama dari rilis GitHub terbaru: saat aplikasi dibuka, setiap kembali dari latar belakang, dan berkala tiap 20 menit. "Nanti" hanya menunda sampai pemicu berikutnya. Tidak ada dialog ganda; desain dialog diperbarui; jika APK universal tidak ada, tombol langsung membuka halaman rilis.
+- **Hasil pencarian bergaya Sonara**: chip filter bulat (Semua/Lagu/Album/Artis/Playlist), kartu **Hasil Teratas** (Mainkan Sekarang + Radio), judul "Lagu-lagu untuk ..." dengan tombol **Putar Semua**, dan daftar lagu dalam satu kartu membulat dengan menu "...".
+- **Panel saran pencarian** kini satu kartu dropdown membulat yang ringkas.
+- **Beranda lebih modern**: chip suasana (Energi, Santai, Fokus, Pesta, Galau, Romantis) yang langsung membuka pencarian, dan grid 2 kolom **Pilihan Cepat** dari lagu yang baru diputar.
+
+---
+
 ## [2.0.0] - 2026-11-24
 
 ### Added

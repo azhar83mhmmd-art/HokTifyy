@@ -514,77 +514,99 @@ class _LibraryScreenViewState extends State<_LibraryScreenView> {
     );
   }
 
+  /// Tombol ikon kompak untuk header. Ukuran tetap 42 agar keempat tombol
+  /// (cari, buat, gabung, import) selalu muat di layar sempit tanpa terpotong.
+  Widget _headerAction({
+    required IconData icon,
+    required VoidCallback onPressed,
+    String? tooltip,
+    Color? color,
+    double size = 22,
+  }) {
+    return IconButton(
+      onPressed: onPressed,
+      tooltip: tooltip,
+      padding: EdgeInsets.zero,
+      visualDensity: VisualDensity.compact,
+      constraints: const BoxConstraints.tightFor(width: 42, height: 42),
+      icon: Icon(icon, size: size, color: color ?? Default_Theme.primaryColor1),
+    );
+  }
+
+  void _openImport(BuildContext context) {
+    final importPhase = context.read<ContentImportCubit>().state.phase;
+    final isOngoing = importPhase != ImportPhase.idle &&
+        importPhase != ImportPhase.done &&
+        importPhase != ImportPhase.error;
+    if (isOngoing) {
+      final pluginId = context.read<ContentImportCubit>().state.pluginId ?? '';
+      context.pushNamed(RoutePaths.importProcess,
+          queryParameters: {'pluginId': pluginId});
+    } else {
+      context.pushNamed(RoutePaths.importMediaFromPlatforms);
+    }
+  }
+
   SliverAppBar customDiscoverBar(BuildContext context) {
+    // Judul ada di `title` (boleh mengecil/terpotong), semua tombol ada di
+    // `actions` sehingga tidak pernah terdorong keluar layar.
     return SliverAppBar(
       floating: true,
-      pinned: false, // Set to false if you don't want it to stick at the top
+      pinned: false,
       surfaceTintColor: Default_Theme.themeColor,
       backgroundColor: Default_Theme.themeColor,
-      title: Row(
-        children: [
-          Text(
-            AppLocalizations.of(context)!.libraryTitle,
-            style: Default_Theme.primaryTextStyle.merge(
-              const TextStyle(
-                fontSize: 34,
-                color: Default_Theme.primaryColor1,
-                fontWeight: FontWeight.w700,
-              ),
+      automaticallyImplyLeading: false,
+      titleSpacing: 18,
+      toolbarHeight: 64,
+      title: FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: Alignment.centerLeft,
+        child: Text(
+          AppLocalizations.of(context)!.libraryTitle,
+          maxLines: 1,
+          style: Default_Theme.primaryTextStyle.merge(
+            const TextStyle(
+              fontSize: 28,
+              color: Default_Theme.primaryColor1,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.8,
             ),
           ),
-          const Spacer(),
-          IconButton(
-            padding: const EdgeInsets.all(8),
-            onPressed: () {
-              if (_isSearching) {
-                _closeSearch();
-              } else {
-                _openSearch();
-              }
-            },
-            icon: Icon(
-              _isSearching ? MingCute.close_fill : MingCute.search_line,
-              size: 24,
-              color: _isSearching
-                  ? Default_Theme.accentColor2
-                  : Default_Theme.primaryColor1,
-            ),
-          ),
-          IconButton(
-            padding: const EdgeInsets.all(8),
-            onPressed: () => createPlaylistDialog(context),
-            icon: const Icon(MingCute.add_fill,
-                size: 25, color: Default_Theme.primaryColor1),
-          ),
-          IconButton(
-            padding: const EdgeInsets.all(8),
-            onPressed: () => joinSharedPlaylistDialog(context),
-            tooltip: 'Gabung Playlist Bersama',
-            icon: const Icon(MingCute.user_add_fill,
-                size: 23, color: Default_Theme.primaryColor1),
-          ),
-          IconButton(
-            padding: const EdgeInsets.all(8),
-            onPressed: () {
-              final importPhase =
-                  context.read<ContentImportCubit>().state.phase;
-              final isOngoing = importPhase != ImportPhase.idle &&
-                  importPhase != ImportPhase.done &&
-                  importPhase != ImportPhase.error;
-              if (isOngoing) {
-                final pluginId =
-                    context.read<ContentImportCubit>().state.pluginId ?? '';
-                context.pushNamed(RoutePaths.importProcess,
-                    queryParameters: {'pluginId': pluginId});
-              } else {
-                context.pushNamed(RoutePaths.importMediaFromPlatforms);
-              }
-            },
-            icon: const Icon(FontAwesome.file_import_solid,
-                size: 22, color: Default_Theme.primaryColor1),
-          ),
-        ],
+        ),
       ),
+      actions: [
+        _headerAction(
+          icon: _isSearching ? MingCute.close_fill : MingCute.search_line,
+          color: _isSearching
+              ? Default_Theme.accentColor2
+              : Default_Theme.primaryColor1,
+          onPressed: () {
+            if (_isSearching) {
+              _closeSearch();
+            } else {
+              _openSearch();
+            }
+          },
+        ),
+        _headerAction(
+          icon: MingCute.add_fill,
+          size: 24,
+          tooltip: 'Buat Playlist',
+          onPressed: () => createPlaylistDialog(context),
+        ),
+        _headerAction(
+          icon: MingCute.user_add_fill,
+          tooltip: 'Gabung Playlist Bersama',
+          onPressed: () => joinSharedPlaylistDialog(context),
+        ),
+        _headerAction(
+          icon: FontAwesome.file_import_solid,
+          size: 20,
+          tooltip: 'Import Playlist',
+          onPressed: () => _openImport(context),
+        ),
+        const SizedBox(width: 6),
+      ],
     );
   }
 }

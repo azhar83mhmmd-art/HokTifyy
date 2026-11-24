@@ -53,6 +53,7 @@ class _GlobalEventListenerState extends State<GlobalEventListener> {
   @override
   void initState() {
     super.initState();
+    UpdateService.start(widget.navigatorKey);
     _pluginSub = PluginEventBus.instance.events.listen(_onPluginEvent);
     _appErrorSub = GlobalEventBus.instance.errors.listen(_onAppError);
   }
@@ -121,13 +122,9 @@ class _GlobalEventListenerState extends State<GlobalEventListener> {
           case UpdateAvailable:
             final s = state as UpdateAvailable;
             log("Update Available: ${s.newVersion}+${s.newBuild}");
-            UpdateService.showUpdateDialog(
-              dialogContext,
-              s.newVersion,
-              AppConfig.websiteUrl,
-              s.downloadUrl,
-              "Pembaruan versi terbaru ${s.newVersion}+${s.newBuild} telah dirilis di GitHub. Anda dapat membuka web resmi atau mengunduh dan memperbarui aplikasi secara langsung.",
-            );
+            // Pop-up ditangani terpusat oleh UpdateService (muncul terus
+            // sampai aplikasi diperbarui, tanpa dialog ganda).
+            UpdateService.checkNow(force: true);
             break;
           case AlertDialogState:
             final s = state as AlertDialogState;
