@@ -2,7 +2,7 @@ name: "Build HokTifyy APK"
 
 # Cara pakai:
 #   - Manual : tab Actions -> "Build HokTifyy APK" -> Run workflow
-#   - Otomatis: push tag, mis. `git tag v1.0.0+1 && git push --tags`
+#   - Otomatis: push tag, mis. `git tag v2.0.0+1 && git push --tags`
 # Hasil: APK ada di tab Releases (dan di Artifacts).
 
 on:

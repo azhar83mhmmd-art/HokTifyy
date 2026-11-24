@@ -2,7 +2,7 @@ name: streambeats
 description: HokTifyy - open source free music player (based on StreamBeats, source by Valora Official).
 
 publish_to: 'none'
-version: 1.0.0+1
+version: 2.0.0+1
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
@@ -129,6 +129,7 @@ flutter:
     - assets/icons/hoktifyy_logo.png
     - assets/icons/loading.gif
     - assets/repositories.json
+    - assets/vibes/
     
   fonts:
     - family: Inter

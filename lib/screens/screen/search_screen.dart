@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:iconsx_plus/iconsx_plus.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -10,6 +11,7 @@ import 'package:streambeats/blocs/media_player/streambeats_player_cubit.dart';
 import 'package:streambeats/blocs/search_suggestions/search_suggestion_bloc.dart';
 import 'package:streambeats/blocs/internet_connectivity/cubit/connectivity_cubit.dart';
 import 'package:streambeats/core/di/service_locator.dart';
+import 'package:streambeats/core/constants/route_paths.dart';
 import 'package:streambeats/core/models/exported.dart';
 import 'package:streambeats/core/theme/app_theme.dart';
 import 'package:streambeats/l10n/app_localizations.dart';
@@ -18,6 +20,8 @@ import 'package:streambeats/plugins/blocs/content/content_event.dart';
 import 'package:streambeats/plugins/blocs/content/content_state.dart';
 import 'package:streambeats/plugins/blocs/plugin/plugin_bloc.dart';
 import 'package:streambeats/plugins/blocs/plugin/plugin_state.dart';
+import 'package:streambeats/screens/screen/home_views/setting_view.dart';
+import 'package:streambeats/screens/screen/search/vibes_browse.dart';
 import 'package:streambeats/screens/widgets/album_card.dart';
 import 'package:streambeats/screens/widgets/artist_card.dart';
 import 'package:streambeats/screens/widgets/more_bottom_sheet.dart';
@@ -52,6 +56,8 @@ class _SearchScreenState extends State<SearchScreen> {
       ValueNotifier(false);
   final ValueNotifier<int> _highlightedSuggestionIndexNotifier =
       ValueNotifier(-1);
+  // true = tampilkan beranda "Getaran"; false = tampilkan hasil pencarian.
+  final ValueNotifier<bool> _browseNotifier = ValueNotifier(true);
 
   List<({String query, ContentSearchFilter filter})>
       _currentCombinedSuggestions = [];
@@ -84,6 +90,9 @@ class _SearchScreenState extends State<SearchScreen> {
       _contentBloc.add(SetActiveContentPlugin(pluginId: activeId));
     }
 
+    // Muat riwayat agar panel "Pencarian Terbaru" di beranda langsung terisi.
+    context.read<SearchSuggestionBloc>().add(const SearchSuggestionFetch(''));
+
     if (widget.searchQuery.isNotEmpty) {
       _textEditingController.text = widget.searchQuery;
       _doSearch(widget.searchQuery);
@@ -99,6 +108,7 @@ class _SearchScreenState extends State<SearchScreen> {
     _activePluginIdNotifier.dispose();
     _isSuggestionPanelOpenNotifier.dispose();
     _highlightedSuggestionIndexNotifier.dispose();
+    _browseNotifier.dispose();
     _contentBloc.close();
     super.dispose();
   }
@@ -147,6 +157,7 @@ class _SearchScreenState extends State<SearchScreen> {
     if (normalizedQuery.isEmpty || _activePluginIdNotifier.value == null)
       return;
 
+    _browseNotifier.value = false;
     context
         .read<SearchSuggestionBloc>()
         .add(SearchSuggestionSave(normalizedQuery));
@@ -162,6 +173,16 @@ class _SearchScreenState extends State<SearchScreen> {
       _performSearch(query: query, filter: ContentSearchFilter.all);
   void _doSearchWithFilter(String query, ContentSearchFilter filter) =>
       _performSearch(query: query, filter: filter);
+
+  /// Kembali ke beranda "Getaran" dan bersihkan hasil.
+  void _goBackToVibes() {
+    _textEditingController.clear();
+    _filterNotifier.value = ContentSearchFilter.all;
+    _browseNotifier.value = true;
+    _contentBloc.add(const ClearSearch());
+    _closeSuggestionPanel();
+    context.read<SearchSuggestionBloc>().add(const SearchSuggestionFetch(''));
+  }
 
   void _triggerSearch() {
     if (_textEditingController.text.trim().isNotEmpty) {
@@ -223,74 +244,96 @@ class _SearchScreenState extends State<SearchScreen> {
 
               SafeArea(
                 child: ValueListenableBuilder<bool>(
-                  valueListenable: _isSuggestionPanelOpenNotifier,
-                  builder: (context, isSuggestionPanelOpen, _) {
-                    return CustomScrollView(
-                      controller: _scrollController,
-                      physics: const BouncingScrollPhysics(),
-                      slivers: [
-                        _FloatingSearchBarSliver(
-                          textEditingController: _textEditingController,
-                          searchFocusNode: _searchFocusNode,
-                          handleKeyEvent: _handleKeyEvent,
-                          contentBloc: _contentBloc,
-                          currentCombinedSuggestions:
-                              _currentCombinedSuggestions,
-                          highlightedIndexNotifier:
-                              _highlightedSuggestionIndexNotifier,
-                          onSearchRequested: _performSearch,
-                          onClearRequested: () {
-                            _textEditingController.clear();
-                            _openSuggestionPanel();
-                            context
-                                .read<SearchSuggestionBloc>()
-                                .add(const SearchSuggestionFetch(''));
-                            _searchFocusNode.requestFocus();
-                          },
-                          onQueryChanged: (val) {
-                            _openSuggestionPanel();
-                            context
-                                .read<SearchSuggestionBloc>()
-                                .add(SearchSuggestionFetch(val));
-                          },
-                        ),
-                        _AestheticFilterChipsSliver(
-                          filterNotifier: _filterNotifier,
-                          textEditingController: _textEditingController,
-                          onFilterTapped: _triggerSearch,
-                        ),
-                        if (!isSuggestionPanelOpen)
-                          _PluginsGlassyBoxSliver(
-                            activePluginNotifier: _activePluginIdNotifier,
-                            contentBloc: _contentBloc,
-                            onPluginChanged: _triggerSearch,
-                            textEditingController: _textEditingController,
-                          ),
-                        if (isSuggestionPanelOpen)
-                          _SuggestionsSliver(
-                            textEditingController: _textEditingController,
-                            highlightedIndexNotifier:
-                                _highlightedSuggestionIndexNotifier,
-                            onSearchInAllCategories: _doSearchInAllCategories,
-                            onSearchWithFilter: _doSearchWithFilter,
-                            onSetSearchFieldText: (query) {
-                              _setSearchFieldText(query);
-                              _openSuggestionPanel();
-                              _searchFocusNode.requestFocus();
-                              context
-                                  .read<SearchSuggestionBloc>()
-                                  .add(SearchSuggestionFetch(query));
-                            },
-                            onSuggestionsGenerated: (suggestions) {
-                              _currentCombinedSuggestions = suggestions;
-                            },
-                          )
-                        else
-                          _ContentSliver(
-                            contentBloc: _contentBloc,
-                            activePluginNotifier: _activePluginIdNotifier,
-                          ),
-                      ],
+                  valueListenable: _browseNotifier,
+                  builder: (context, isBrowse, _) {
+                    return ValueListenableBuilder<bool>(
+                      valueListenable: _isSuggestionPanelOpenNotifier,
+                      builder: (context, isSuggestionPanelOpen, _) {
+                        return CustomScrollView(
+                          controller: _scrollController,
+                          physics: const BouncingScrollPhysics(),
+                          slivers: [
+                            const _BrandHeaderSliver(),
+                            _FloatingSearchBarSliver(
+                              textEditingController: _textEditingController,
+                              searchFocusNode: _searchFocusNode,
+                              handleKeyEvent: _handleKeyEvent,
+                              contentBloc: _contentBloc,
+                              isBrowse: isBrowse,
+                              onBackToVibes: _goBackToVibes,
+                              currentCombinedSuggestions:
+                                  _currentCombinedSuggestions,
+                              highlightedIndexNotifier:
+                                  _highlightedSuggestionIndexNotifier,
+                              onSearchRequested: _performSearch,
+                              onClearRequested: () {
+                                _textEditingController.clear();
+                                _openSuggestionPanel();
+                                context
+                                    .read<SearchSuggestionBloc>()
+                                    .add(const SearchSuggestionFetch(''));
+                                _searchFocusNode.requestFocus();
+                              },
+                              onQueryChanged: (val) {
+                                _openSuggestionPanel();
+                                context
+                                    .read<SearchSuggestionBloc>()
+                                    .add(SearchSuggestionFetch(val));
+                              },
+                            ),
+                            const _ScopeBarSliver(),
+                            if (!isBrowse)
+                              _AestheticFilterChipsSliver(
+                                filterNotifier: _filterNotifier,
+                                textEditingController: _textEditingController,
+                                onFilterTapped: _triggerSearch,
+                              ),
+                            if (!isSuggestionPanelOpen)
+                              _PluginsGlassyBoxSliver(
+                                activePluginNotifier: _activePluginIdNotifier,
+                                contentBloc: _contentBloc,
+                                onPluginChanged: _triggerSearch,
+                                textEditingController: _textEditingController,
+                              ),
+                            if (isSuggestionPanelOpen)
+                              _SuggestionsSliver(
+                                textEditingController: _textEditingController,
+                                highlightedIndexNotifier:
+                                    _highlightedSuggestionIndexNotifier,
+                                onSearchInAllCategories:
+                                    _doSearchInAllCategories,
+                                onSearchWithFilter: _doSearchWithFilter,
+                                onSetSearchFieldText: (query) {
+                                  _setSearchFieldText(query);
+                                  _openSuggestionPanel();
+                                  _searchFocusNode.requestFocus();
+                                  context
+                                      .read<SearchSuggestionBloc>()
+                                      .add(SearchSuggestionFetch(query));
+                                },
+                                onSuggestionsGenerated: (suggestions) {
+                                  _currentCombinedSuggestions = suggestions;
+                                },
+                              )
+                            else if (isBrowse)
+                              SliverToBoxAdapter(
+                                child: VibesBrowse(
+                                  onVibeTap: (q) => _doSearchWithFilter(
+                                      q, ContentSearchFilter.track),
+                                  onRecentTap: _doSearchInAllCategories,
+                                  onClearHistory: () => context
+                                      .read<SearchSuggestionBloc>()
+                                      .add(const SearchSuggestionClearAll()),
+                                ),
+                              )
+                            else
+                              _ContentSliver(
+                                contentBloc: _contentBloc,
+                                activePluginNotifier: _activePluginIdNotifier,
+                              ),
+                          ],
+                        );
+                      },
                     );
                   },
                 ),
@@ -303,11 +346,167 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 }
 
+/// Header merek: logo + nama HokTifyy bergradasi ungu, tombol pengaturan.
+class _BrandHeaderSliver extends StatelessWidget {
+  const _BrandHeaderSliver();
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 10, 14, 0),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(9),
+              child: Image.asset(
+                'assets/icons/hoktifyy_new_logo_c.png',
+                width: 30,
+                height: 30,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => const SizedBox(width: 30, height: 30),
+              ),
+            ),
+            const SizedBox(width: 10),
+            ShaderMask(
+              shaderCallback: (rect) =>
+                  Default_Theme.brandGradient.createShader(rect),
+              child: const Text(
+                'HokTifyy',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.4,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            const Spacer(),
+            Material(
+              color: Colors.white.withValues(alpha: 0.07),
+              shape: const CircleBorder(),
+              child: InkWell(
+                customBorder: const CircleBorder(),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const SettingsView()),
+                ),
+                child: const Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Icon(MingCute.settings_3_line,
+                      size: 22, color: Default_Theme.primaryColor1),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Pemilih lingkup: Online (halaman ini) atau Perpustakaan Lokal (tab Lokal).
+class _ScopeBarSliver extends StatelessWidget {
+  const _ScopeBarSliver();
+
+  @override
+  Widget build(BuildContext context) {
+    final t = SearchTexts.of(context);
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 2, 16, 10),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _ScopeButton(
+                  icon: MingCute.globe_line,
+                  label: t.online,
+                  selected: true,
+                  onTap: () {},
+                ),
+                _ScopeButton(
+                  icon: MingCute.folder_open_line,
+                  label: t.localLibrary,
+                  selected: false,
+                  onTap: () => context.goNamed(RoutePaths.localMusicScreen),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ScopeButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _ScopeButton({
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final fg = selected
+        ? const Color(0xFF2E1A66)
+        : Default_Theme.primaryColor1.withValues(alpha: 0.75);
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        HapticFeedback.selectionClick();
+        onTap();
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOutCubic,
+        height: 34,
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        decoration: BoxDecoration(
+          color: selected ? Default_Theme.accentColor2 : Colors.transparent,
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 16, color: fg),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w700,
+                color: fg,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _FloatingSearchBarSliver extends StatelessWidget {
   final TextEditingController textEditingController;
   final FocusNode searchFocusNode;
   final ContentBloc contentBloc;
   final FocusOnKeyEventCallback handleKeyEvent;
+  final bool isBrowse;
+  final VoidCallback onBackToVibes;
   final List<({String query, ContentSearchFilter filter})>
       currentCombinedSuggestions;
   final ValueNotifier<int> highlightedIndexNotifier;
@@ -321,6 +520,8 @@ class _FloatingSearchBarSliver extends StatelessWidget {
     required this.searchFocusNode,
     required this.contentBloc,
     required this.handleKeyEvent,
+    required this.isBrowse,
+    required this.onBackToVibes,
     required this.currentCombinedSuggestions,
     required this.highlightedIndexNotifier,
     required this.onSearchRequested,
@@ -337,19 +538,48 @@ class _FloatingSearchBarSliver extends StatelessWidget {
       shadowColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
       titleSpacing: 16,
-      toolbarHeight: 70,
-      title: Focus(
+      toolbarHeight: 72,
+      title: Row(
+        children: [
+          if (!isBrowse) ...[
+            Tooltip(
+              message: SearchTexts.of(context).backToVibes,
+              child: Material(
+                color: Default_Theme.surfaceHighColor,
+                shape: const CircleBorder(),
+                child: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: onBackToVibes,
+                  child: const SizedBox(
+                    width: 48,
+                    height: 48,
+                    child: Icon(MingCute.left_line,
+                        size: 22, color: Default_Theme.primaryColor1),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+          ],
+          Expanded(child: _buildPill(context)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPill(BuildContext context) {
+    return Focus(
         onKeyEvent: handleKeyEvent,
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(28),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(18),
+                color: Default_Theme.surfaceHighColor.withValues(alpha: 0.92),
+                borderRadius: BorderRadius.circular(28),
                 border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.08), width: 1),
+                    color: Colors.white.withValues(alpha: 0.07), width: 1),
               ),
               child: Row(
                 children: [
@@ -384,8 +614,7 @@ class _FloatingSearchBarSliver extends StatelessWidget {
                         isDense: true,
                         contentPadding:
                             const EdgeInsets.symmetric(vertical: 14),
-                        hintText:
-                            AppLocalizations.of(context)!.searchHintExplore,
+                        hintText: SearchTexts.of(context).hint,
                         hintStyle: TextStyle(
                           color: Default_Theme.primaryColor1
                               .withValues(alpha: 0.35),
@@ -416,8 +645,7 @@ class _FloatingSearchBarSliver extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 
   Widget _buildAnimatedSearchLeadingIcon() {
@@ -476,7 +704,7 @@ class _AestheticFilterChipsSliver extends StatelessWidget {
         valueListenable: filterNotifier,
         builder: (context, filterValue, child) {
           return SizedBox(
-            height: 38,
+            height: 42,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
@@ -516,7 +744,7 @@ class _AestheticFilterChipsSliver extends StatelessWidget {
                       displayName,
                       style: Default_Theme.secondoryTextStyleMedium.copyWith(
                         color: isSelected
-                            ? Default_Theme.primaryColor2
+                            ? const Color(0xFF2E1A66)
                             : Default_Theme.primaryColor1
                                 .withValues(alpha: 0.8),
                         fontSize: 13,
@@ -550,6 +778,7 @@ class _PluginsGlassyBoxSliver extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = SearchTexts.of(context);
     return SliverToBoxAdapter(
       child: BlocBuilder<PluginBloc, PluginState>(
         buildWhen: (prev, curr) =>
@@ -557,94 +786,80 @@ class _PluginsGlassyBoxSliver extends StatelessWidget {
         builder: (context, pluginState) {
           final resolvers = pluginState.loadedContentResolvers;
 
+          // Baris sumber satu garis (ringkas) agar beranda Getaran tetap lega.
           return Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(24),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  decoration: BoxDecoration(
-                    color: Default_Theme.primaryColor2.withValues(alpha: 0.04),
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.05), width: 1),
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+            child: Container(
+              height: 48,
+              decoration: BoxDecoration(
+                color: Default_Theme.surfaceColor,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+              ),
+              child: Row(
+                children: [
+                  const SizedBox(width: 14),
+                  const Icon(MingCute.plugin_2_line,
+                      size: 17, color: Default_Theme.accentColor2),
+                  const SizedBox(width: 8),
+                  Text(
+                    t.sources,
+                    style: Default_Theme.secondoryTextStyleMedium.copyWith(
+                      fontSize: 11,
+                      letterSpacing: 1.4,
+                      fontWeight: FontWeight.w800,
+                      color:
+                          Default_Theme.primaryColor1.withValues(alpha: 0.7),
+                    ),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const Icon(MingCute.plugin_2_line,
-                                size: 18, color: Default_Theme.accentColor2),
-                            const SizedBox(width: 8),
-                            Text(
-                              AppLocalizations.of(context)!.searchSources,
-                              style: Default_Theme.secondoryTextStyleMedium
-                                  .copyWith(
-                                fontSize: 12,
-                                letterSpacing: 1.5,
-                                fontWeight: FontWeight.w800,
-                                color: Default_Theme.primaryColor1
-                                    .withValues(alpha: 0.7),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      if (resolvers.isEmpty)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
-                          child: Text(
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: resolvers.isEmpty
+                        ? Text(
                             AppLocalizations.of(context)!.searchNoPlugins,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                                 color: Default_Theme.primaryColor1
                                     .withValues(alpha: 0.4),
+                                fontSize: 12,
                                 fontStyle: FontStyle.italic),
+                          )
+                        : ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            physics: const BouncingScrollPhysics(),
+                            padding: const EdgeInsets.only(right: 10),
+                            itemCount: resolvers.length,
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(width: 8),
+                            itemBuilder: (context, i) {
+                              final plugin = resolvers[i];
+                              return Center(
+                                child: _PluginChip(
+                                  plugin: plugin,
+                                  activePluginNotifier: activePluginNotifier,
+                                  onTap: () {
+                                    final id = plugin.manifest.id;
+                                    if (activePluginNotifier.value == id) {
+                                      return;
+                                    }
+                                    activePluginNotifier.value = id;
+                                    contentBloc.add(
+                                        SetActiveContentPlugin(pluginId: id));
+                                    context
+                                        .read<SettingsCubit>()
+                                        .setSearchPluginId(id);
+                                    if (textEditingController
+                                        .text.isNotEmpty) {
+                                      onPluginChanged();
+                                    }
+                                  },
+                                ),
+                              );
+                            },
                           ),
-                        )
-                      else
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          physics: const BouncingScrollPhysics(),
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Row(
-                            children: resolvers
-                                .map((plugin) => Padding(
-                                      padding: const EdgeInsets.only(right: 10),
-                                      child: _PluginChip(
-                                        plugin: plugin,
-                                        activePluginNotifier:
-                                            activePluginNotifier,
-                                        onTap: () {
-                                          final id = plugin.manifest.id;
-                                          if (activePluginNotifier.value == id)
-                                            return;
-                                          activePluginNotifier.value = id;
-                                          contentBloc.add(
-                                              SetActiveContentPlugin(
-                                                  pluginId: id));
-                                          context
-                                              .read<SettingsCubit>()
-                                              .setSearchPluginId(id);
-                                          if (textEditingController.text
-                                              .isNotEmpty) onPluginChanged();
-                                        },
-                                      ),
-                                    ))
-                                .toList(),
-                          ),
-                        ),
-                    ],
                   ),
-                ),
+                ],
               ),
             ),
           );

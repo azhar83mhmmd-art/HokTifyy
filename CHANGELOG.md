@@ -1,5 +1,23 @@
 # Changelog HokTifyy
 
+## [2.0.0] - 2026-11-24
+
+### Added
+- **Pencarian baru bergaya "Getaran"**: beranda pencarian dengan kartu suasana bergaya masonry (Hip Hop & Rap, Pop, Santai, Elektronik, R&B, Pesta). Sekali ketuk langsung mencari lagu sesuai suasana.
+- Panel **Lebih Banyak Suasana & Wilayah** (Pop Indonesia, K-Pop & J-Pop, Indie Akustik, Gas Olahraga, Nyetir Malam, Fokus & Belajar).
+- Panel **Pencarian Terbaru** + tombol Hapus semua riwayat, dan pintasan riwayat cepat di samping judul Getaran.
+- Header merek HokTifyy (logo + gradasi ungu) dengan tombol Pengaturan, serta tombol kembali ke Getaran saat melihat hasil.
+- Pemilih lingkup **Online / Perpustakaan Lokal** (Lokal membuka tab musik lokal).
+- Kartu Getaran memakai foto artis (dikompres, sekitar 0,5 MB total) dengan seni kontur sebagai cadangan bila gambar gagal dimuat.
+
+### Changed
+- Kotak pencarian jadi pil penuh dengan placeholder baru; filter (Semua/Track/Album/Artist/Playlist) hanya muncul saat melihat hasil.
+- Baris **Sumber** (ytmusic/ytvideo) dibuat satu garis ringkas.
+- Teks pada chip filter terpilih diperjelas (kontras lebih baik).
+- Versi aplikasi naik dari 1.0.0 menjadi **2.0.0**.
+
+---
+
 ## [1.0.0] - 2026-11-21
 
 ### Changed

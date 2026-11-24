@@ -71,6 +71,22 @@ class SearchSuggestionBloc
       }
     });
 
+    on<SearchSuggestionClearAll>((event, emit) async {
+      try {
+        await _searchHistoryDao.clearAllSearchHistory();
+      } catch (e) {
+        log("Error clearing all search history: $e",
+            name: "SearchSuggestionBloc");
+      }
+      if (_isDisposed || emit.isDone) return;
+      emit(SearchSuggestionLoaded(
+        state.suggestionList,
+        const [],
+        entitySuggestionList: state.entitySuggestionList,
+        isPluginLoading: state.isPluginLoading,
+      ));
+    });
+
     on<SearchSuggestionClear>((event, emit) async {
       if (state is SearchSuggestionLoading) {
         return;
