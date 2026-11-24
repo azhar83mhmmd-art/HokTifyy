@@ -29,6 +29,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsx_plus/iconsx_plus.dart';
 import 'chart/carousal_widget.dart';
 import '../widgets/horizontal_card_view.dart';
+import '../widgets/hok_mix_card.dart';
 import '../widgets/tab_list_widget.dart';
 import 'package:streambeats/screens/widgets/global_footer.dart';
 import 'package:streambeats/services/supabase_auth_service.dart';
@@ -182,6 +183,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 SliverList(
                   delegate: SliverChildListDelegate(
                     [
+                      BlocBuilder<RecentlyCubit, RecentlyCubitState>(
+                        builder: (context, state) =>
+                            HokDailyMixCard(tracks: state.tracks),
+                      ),
                       const CaraouselWidget(),
                       Padding(
                         padding: const EdgeInsets.only(top: 15.0),
@@ -478,15 +483,33 @@ class CustomDiscoverBar extends StatelessWidget {
       title: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Expanded(
-            child: Text(
-              'Beranda',
-              style: TextStyle(
-                fontSize: 36,
-                fontWeight: FontWeight.w800,
-                letterSpacing: -1,
-                color: Colors.white,
-              ),
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _getGreeting(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.4,
+                    color: Default_Theme.accentColor2,
+                  ),
+                ),
+                const Text(
+                  'Beranda',
+                  style: TextStyle(
+                    fontSize: 32,
+                    height: 1.1,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -1,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
             ),
           ),
           const TimerIcon(),
