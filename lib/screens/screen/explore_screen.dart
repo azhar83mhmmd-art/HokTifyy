@@ -387,7 +387,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     ],
                   ),
                 ),
-              ],
+              
+SliverToBoxAdapter(child: SizedBox(height: MediaQuery.paddingOf(context).bottom + 16)),
+],
             ),
           ),
           backgroundColor: Default_Theme.themeColor,

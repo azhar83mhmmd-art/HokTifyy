@@ -1,3 +1,4 @@
+import 'package:streambeats/screens/widgets/tap_scale.dart';
 import 'package:streambeats/core/models/exported.dart';
 import 'package:streambeats/screens/screen/common_views/artist_view.dart';
 import 'package:streambeats/core/theme/app_theme.dart';
@@ -32,7 +33,7 @@ class _ArtistCardState extends State<ArtistCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return TapScale(child: Padding(
       padding: const EdgeInsets.only(top: 10),
       child: SizedBox(
         width: 160,
@@ -106,6 +107,6 @@ class _ArtistCardState extends State<ArtistCard> {
           ),
         ),
       ),
-    );
+    ));
   }
 }

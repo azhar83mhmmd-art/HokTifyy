@@ -29,6 +29,7 @@ import 'package:streambeats/screens/widgets/playlist_card.dart';
 import 'package:streambeats/screens/widgets/sign_board_widget.dart';
 import 'package:streambeats/screens/widgets/song_tile.dart';
 import 'package:streambeats/screens/widgets/search_result_widgets.dart';
+import 'package:streambeats/screens/widgets/skeleton.dart';
 import 'package:streambeats/src/rust/api/plugin/commands.dart';
 import 'package:streambeats/src/rust/api/plugin/plugin_info.dart';
 import 'package:streambeats/src/rust/api/plugin/models.dart' as plugin_models;
@@ -166,6 +167,11 @@ class _SearchScreenState extends State<SearchScreen> {
     _filterNotifier.value = filter;
     _closeSuggestionPanel();
     _contentBloc.add(SearchContent(query: normalizedQuery, filter: filter));
+    // Pengguna hampir selalu lanjut ke tab "Lagu": siapkan di latar belakang.
+    if (filter == ContentSearchFilter.all) {
+      _contentBloc.add(PrefetchSearchContent(
+          query: normalizedQuery, filter: ContentSearchFilter.track));
+    }
   }
 
   void _doSearch(String query) =>
@@ -280,6 +286,13 @@ class _SearchScreenState extends State<SearchScreen> {
                                 context
                                     .read<SearchSuggestionBloc>()
                                     .add(SearchSuggestionFetch(val));
+                                // Panaskan hasil di latar belakang agar Enter terasa instan.
+                                final q = _normalizeSearchQuery(val);
+                                if (q.length >= 2) {
+                                  _contentBloc.add(PrefetchSearchContent(
+                                      query: q,
+                                      filter: ContentSearchFilter.all));
+                                }
                               },
                             ),
                             const _ScopeBarSliver(),
@@ -1104,7 +1117,7 @@ class _SuggestionsSliver extends StatelessWidget {
                     onSearch: onSearchWithFilter,
                   )),
             ],
-            const SizedBox(height: 120),
+            const SizedBox(height: 150),
           ];
 
           return SliverPadding(
@@ -1387,11 +1400,7 @@ class _ContentSliver extends StatelessWidget {
                 state.searchResults!.items.isNotEmpty;
 
             if (state.searchStatus == SearchStatus.loading && !hasResults) {
-              return const SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Center(
-                      child: CircularProgressIndicator(
-                          color: Default_Theme.accentColor2)));
+              return const SliverToBoxAdapter(child: SearchResultsSkeleton());
             }
             if ((state.searchStatus == SearchStatus.loading ||
                     state.searchStatus == SearchStatus.loaded ||

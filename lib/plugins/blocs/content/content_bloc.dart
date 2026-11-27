@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,7 +17,82 @@ import 'package:streambeats/plugins/utils/media_id.dart';
 import 'package:streambeats/services/plugin_cache_codec.dart';
 import 'package:streambeats/src/rust/api/plugin/commands.dart';
 
+class _CachedSearch {
+  final PagedMediaItems results;
+  final DateTime at;
+  _CachedSearch(this.results) : at = DateTime.now();
+}
+
 class ContentBloc extends Bloc<ContentEvent, ContentState> {
+  // Cache & de-dup bersifat static: bloc pencarian dibuat ulang tiap layar
+  // dibuka, tetapi hasil sebelumnya tetap bisa dipakai selama sesi aplikasi.
+  static final LinkedHashMap<String, _CachedSearch> _searchCache =
+      LinkedHashMap<String, _CachedSearch>();
+  static final Map<String, Future<PagedMediaItems>> _searchInflight = {};
+  static const Duration _searchTtl = Duration(minutes: 10);
+  static const int _searchCacheMax = 40;
+
+  static String _searchKey(String pluginId, String query,
+          ContentSearchFilter filter, String? pageToken) =>
+      '$pluginId|${filter.name}|${query.trim().toLowerCase()}|${pageToken ?? ''}';
+
+  static PagedMediaItems? _readSearchCache(String key) {
+    final hit = _searchCache.remove(key);
+    if (hit == null) return null;
+    if (DateTime.now().difference(hit.at) > _searchTtl) return null;
+    _searchCache[key] = hit; // naikkan ke posisi terbaru (LRU)
+    return hit.results;
+  }
+
+  static void _writeSearchCache(String key, PagedMediaItems results) {
+    _searchCache.remove(key);
+    _searchCache[key] = _CachedSearch(results);
+    while (_searchCache.length > _searchCacheMax) {
+      _searchCache.remove(_searchCache.keys.first);
+    }
+  }
+
+  /// Satu-satunya pintu request pencarian: memakai cache, dan menggabungkan
+  /// request identik yang sedang berjalan (mis. prefetch lalu Enter).
+  Future<PagedMediaItems> _fetchSearch({
+    required String pluginId,
+    required String query,
+    required ContentSearchFilter filter,
+    String? pageToken,
+  }) {
+    final key = _searchKey(pluginId, query, filter, pageToken);
+    final cached = _readSearchCache(key);
+    if (cached != null) return Future.value(cached);
+
+    final running = _searchInflight[key];
+    if (running != null) return running;
+
+    final future = () async {
+      final response = await _pluginService.execute(
+        pluginId: pluginId,
+        request: PluginRequest.contentResolver(
+          ContentResolverCommand.search(
+            query: query,
+            filter: filter,
+            pageToken: pageToken,
+          ),
+        ),
+      );
+      switch (response) {
+        case PluginResponse_Search(:final field0):
+          _writeSearchCache(key, field0);
+          return field0;
+        default:
+          throw StateError('Unexpected plugin response for search');
+      }
+    }();
+
+    _searchInflight[key] = future;
+    future.then<void>((_) => _searchInflight.remove(key),
+        onError: (_) => _searchInflight.remove(key));
+    return future;
+  }
+
   final PluginService _pluginService;
   final PluginCacheRepository _cache = ServiceLocator.pluginCache;
 
@@ -25,7 +101,14 @@ class ContentBloc extends Bloc<ContentEvent, ContentState> {
     String? initialPluginId,
   })  : _pluginService = pluginService,
         super(ContentState(activePluginId: initialPluginId)) {
-    on<SearchContent>(_onSearch, transformer: _debounceSearchTransformer());
+    // Pencarian eksplisit (Enter / pilih saran / ganti filter) langsung jalan,
+    // tanpa jeda debounce; request lama dibatalkan hasilnya (switchMap).
+    on<SearchContent>(_onSearch,
+        transformer: (events, mapper) => events.switchMap(mapper));
+    on<PrefetchSearchContent>(_onPrefetchSearch,
+        transformer: (events, mapper) => events
+            .debounceTime(const Duration(milliseconds: 450))
+            .switchMap(mapper));
     on<LoadMoreSearchContent>(_onLoadMoreSearch);
     on<SetActiveContentPlugin>(_onSetActivePlugin);
     on<LoadAlbumDetails>(_onLoadAlbumDetails);
@@ -43,10 +126,19 @@ class ContentBloc extends Bloc<ContentEvent, ContentState> {
     on<ClearHomeSections>(_onClearHomeSections);
   }
 
-  EventTransformer<SearchContent> _debounceSearchTransformer() {
-    return (events, mapper) => events
-        .debounceTime(const Duration(milliseconds: 300))
-        .switchMap(mapper);
+  Future<void> _onPrefetchSearch(
+    PrefetchSearchContent event,
+    Emitter<ContentState> emit,
+  ) async {
+    final pluginId = state.activePluginId;
+    final query = event.query.trim();
+    if (pluginId == null || query.length < 2) return;
+    try {
+      await _fetchSearch(
+          pluginId: pluginId, query: query, filter: event.filter);
+    } catch (_) {
+      // Prefetch bersifat opsional: kegagalan tidak boleh mengganggu UI.
+    }
   }
 
   Future<void> _onSearch(
@@ -73,6 +165,22 @@ class ContentBloc extends Bloc<ContentEvent, ContentState> {
       return;
     }
 
+    final cachedNow = event.pageToken == null
+        ? _readSearchCache(
+            _searchKey(pluginId, event.query, event.filter, null))
+        : null;
+    if (cachedNow != null) {
+      // Cache hit: tampilkan seketika tanpa status loading.
+      emit(state.copyWith(
+        searchStatus: SearchStatus.loaded,
+        searchQuery: event.query,
+        searchFilter: event.filter,
+        searchResults: cachedNow,
+        clearError: true,
+      ));
+      return;
+    }
+
     emit(state.copyWith(
       searchStatus: SearchStatus.loading,
       searchQuery: event.query,
@@ -81,46 +189,18 @@ class ContentBloc extends Bloc<ContentEvent, ContentState> {
     ));
 
     try {
-      final response = await _pluginService.execute(
+      final results = await _fetchSearch(
         pluginId: pluginId,
-        request: PluginRequest.contentResolver(
-          ContentResolverCommand.search(
-            query: event.query,
-            filter: event.filter,
-            pageToken: event.pageToken,
-          ),
-        ),
+        query: event.query,
+        filter: event.filter,
+        pageToken: event.pageToken,
       );
-
-      response.when(
-        search: (results) {
-          emit(state.copyWith(
-            searchStatus: SearchStatus.loaded,
-            searchFilter: event.filter,
-            searchResults: results,
-          ));
-        },
-        trackDetails: (_) => _unexpectedResponse(emit, 'search'),
-        albumDetails: (_) => _unexpectedResponse(emit, 'search'),
-        artistDetails: (_) => _unexpectedResponse(emit, 'search'),
-        playlistDetails: (_) => _unexpectedResponse(emit, 'search'),
-        streams: (_) => _unexpectedResponse(emit, 'search'),
-        moreTracks: (_) => _unexpectedResponse(emit, 'search'),
-        moreAlbums: (_) => _unexpectedResponse(emit, 'search'),
-        homeSections: (_) => _unexpectedResponse(emit, 'search'),
-        loadMoreItems: (_) => _unexpectedResponse(emit, 'search'),
-        charts: (_) => _unexpectedResponse(emit, 'search'),
-        chartDetails: (_) => _unexpectedResponse(emit, 'search'),
-        segments: (_) => _unexpectedResponse(emit, 'search'),
-        lyricsResult: (_) => _unexpectedResponse(emit, 'search'),
-        lyricsSearchResults: (_) => _unexpectedResponse(emit, 'search'),
-        lyricsById: (_, __) => _unexpectedResponse(emit, 'search'),
-        suggestions: (_) => _unexpectedResponse(emit, 'search'),
-        canHandle: (_) => _unexpectedResponse(emit, 'search'),
-        collectionInfo: (_) => _unexpectedResponse(emit, 'search'),
-        importTracks: (_) => _unexpectedResponse(emit, 'search'),
-        ack: () => _unexpectedResponse(emit, 'search'),
-      );
+      if (emit.isDone) return;
+      emit(state.copyWith(
+        searchStatus: SearchStatus.loaded,
+        searchFilter: event.filter,
+        searchResults: results,
+      ));
     } on PluginException catch (e) {
       _handlePluginError(emit, e, SearchStatus.error);
     } catch (e, stack) {

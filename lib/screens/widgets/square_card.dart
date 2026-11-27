@@ -1,3 +1,4 @@
+import 'package:streambeats/screens/widgets/tap_scale.dart';
 import 'package:streambeats/core/theme/app_theme.dart';
 import 'package:streambeats/utils/load_image.dart';
 import 'package:flutter/material.dart';
@@ -48,7 +49,7 @@ class _SquareImgCardState extends State<SquareImgCard> {
     final double cardW = widget.isWide ? 280 : 156;
     final double imageH = widget.isWide ? 156 : 156;
 
-    return Padding(
+    return TapScale(child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 6),
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
@@ -175,6 +176,6 @@ class _SquareImgCardState extends State<SquareImgCard> {
           ),
         ),
       ),
-    );
+    ));
   }
 }

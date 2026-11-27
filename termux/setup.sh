@@ -30,7 +30,7 @@ GH_USER="$(gh api user -q .login)"
 echo "Login sebagai: $GH_USER"
 
 say "3/6 Membuat repo GitHub dan mengunggah source"
-REPO_NAME="$(ask 'Nama repo' 'Vynora Music')"
+REPO_NAME="$(ask 'Nama repo' 'VynoraMusic')"
 VIS="$(ask 'Visibilitas repo (public/private). Public disarankan (lisensi GPL + fitur update-in-app)' 'public')"
 [ -d .git ] || git init -b main
 git config user.name  >/dev/null 2>&1 || git config user.name  "$GH_USER"

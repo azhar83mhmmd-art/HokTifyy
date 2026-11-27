@@ -39,7 +39,8 @@ void showMoreBottomSheet(
     isScrollControlled: true,
     useSafeArea: true,
     isDismissible: true,
-    enableDrag: true,
+    // Drag ditangani DraggableScrollableSheet (perbesar / perkecil / tutup).
+    enableDrag: false,
     backgroundColor: Colors.transparent,
     barrierColor: Colors.black.withValues(alpha: 0.72),
     elevation: 0,
@@ -52,14 +53,23 @@ void showMoreBottomSheet(
           BlocProvider.value(value: playlistCubit),
           BlocProvider.value(value: downloaderCubit),
         ],
-        child: _TrackOptionsBottomSheet(
-          song: song,
-          showDelete: showDelete,
-          showSinglePlay: showSinglePlay,
-          showAddToQueue: showAddToQueue,
-          showPlayNext: showPlayNext,
-          onDelete: onDelete,
-          parentContext: context,
+        child: DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.62,
+          minChildSize: 0.36,
+          maxChildSize: 0.92,
+          snap: true,
+          snapSizes: const [0.62, 0.92],
+          builder: (sheetCtx, scrollController) => _TrackOptionsBottomSheet(
+            song: song,
+            showDelete: showDelete,
+            showSinglePlay: showSinglePlay,
+            showAddToQueue: showAddToQueue,
+            showPlayNext: showPlayNext,
+            onDelete: onDelete,
+            parentContext: context,
+            scrollController: scrollController,
+          ),
         ),
       );
     },
@@ -74,8 +84,10 @@ class _TrackOptionsBottomSheet extends StatelessWidget {
   final bool showPlayNext;
   final VoidCallback? onDelete;
   final BuildContext parentContext;
+  final ScrollController scrollController;
 
   const _TrackOptionsBottomSheet({
+    required this.scrollController,
     required this.song,
     required this.showDelete,
     required this.showSinglePlay,
@@ -88,7 +100,7 @@ class _TrackOptionsBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final maxHeight = MediaQuery.of(context).size.height * 0.85;
+    const maxHeight = double.infinity;
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -119,7 +131,10 @@ class _TrackOptionsBottomSheet extends StatelessWidget {
                   ),
                 ],
               ),
-              child: Column(
+              child: SingleChildScrollView(
+                controller: scrollController,
+                physics: const ClampingScrollPhysics(),
+                child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   _Header(
@@ -134,11 +149,9 @@ class _TrackOptionsBottomSheet extends StatelessWidget {
                       showInfoBtn: true,
                     ),
                   ),
-                  Flexible(
-                    child: SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(),
-                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 12),
-                      child: Column(
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 12),
+                    child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           if (showSinglePlay ||
@@ -334,9 +347,9 @@ class _TrackOptionsBottomSheet extends StatelessWidget {
                           ],
                         ],
                       ),
-                    ),
                   ),
                 ],
+              ),
               ),
             ),
           ),

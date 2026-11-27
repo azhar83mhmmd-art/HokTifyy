@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:ui' show FontFeature;
+import 'dart:ui' show FontFeature, ImageFilter;
 
 import 'package:streambeats/blocs/downloader/cubit/downloader_cubit.dart';
 import 'package:streambeats/blocs/library/cubit/library_items_cubit.dart';
@@ -25,6 +25,7 @@ import 'package:streambeats/screens/widgets/like_widget.dart';
 import 'package:streambeats/screens/widgets/snackbar.dart';
 import 'package:streambeats/core/theme/app_theme.dart';
 import 'package:streambeats/utils/load_image.dart';
+import 'package:streambeats/screens/widgets/artwork_anchors.dart';
 import 'package:streambeats/utils/pallete_generator.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -230,7 +231,7 @@ class _PlayerUIState extends State<_PlayerUI> {
     return Stack(
       fit: StackFit.expand,
       children: [
-        _PlayerBackdrop(tint: _tint),
+        _PlayerBackdrop(tint: _tint, artUri: _lastArtUri),
         SafeArea(
           bottom: false,
           child: Column(
@@ -267,23 +268,65 @@ class _PlayerUIState extends State<_PlayerUI> {
 
 class _PlayerBackdrop extends StatelessWidget {
   final Color tint;
-  const _PlayerBackdrop({required this.tint});
+  final String? artUri;
+  const _PlayerBackdrop({required this.tint, this.artUri});
 
   @override
   Widget build(BuildContext context) {
     const base = Default_Theme.themeColor;
+    final art = artUri;
     return RepaintBoundary(
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 800),
-        curve: Curves.easeOutCubic,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [tint, Color.lerp(tint, base, 0.62)!, base],
-            stops: const [0.0, 0.5, 1.0],
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 800),
+            curve: Curves.easeOutCubic,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [tint, Color.lerp(tint, base, 0.62)!, base],
+                stops: const [0.0, 0.5, 1.0],
+              ),
+            ),
           ),
-        ),
+          // Ambient: sampul diburamkan dan diredam, berganti dengan crossfade.
+          if (art != null && art.isNotEmpty)
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 700),
+              switchInCurve: Curves.easeOut,
+              child: ImageFiltered(
+                key: ValueKey(art),
+                imageFilter: ImageFilter.blur(sigmaX: 48, sigmaY: 48),
+                child: Opacity(
+                  opacity: 0.22,
+                  child: Transform.scale(
+                    scale: 1.5,
+                    child: LoadImageCached(
+                      imageUrl: art,
+                      fallbackUrl: art,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          // Redam bagian bawah agar kontrol tetap terbaca.
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.transparent,
+                  base.withValues(alpha: 0.55),
+                ],
+                stops: const [0.45, 1.0],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -395,7 +438,11 @@ class CoverImageVolSlider extends StatelessWidget {
               final playing = playingSnap.data ?? false;
               return SizedBox.expand(
                 child: Center(
-                  child: AspectRatio(
+                  child: ValueListenableBuilder<double>(
+                    valueListenable: ArtworkAnchors.coverOpacity,
+                    builder: (context, o, child) =>
+                        Opacity(opacity: o, child: child),
+                    child: AspectRatio(
                     aspectRatio: 1.0,
                     child: AnimatedScale(
                       scale: playing ? 1.0 : 0.93,
@@ -404,6 +451,7 @@ class CoverImageVolSlider extends StatelessWidget {
                       child: SoundArcs(
                         isPlaying: playing,
                         child: DecoratedBox(
+                          key: ArtworkAnchors.cover,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(28),
                             boxShadow: [
@@ -426,6 +474,7 @@ class CoverImageVolSlider extends StatelessWidget {
                         ),
                       ),
                     ),
+                  ),
                   ),
                 ),
               );

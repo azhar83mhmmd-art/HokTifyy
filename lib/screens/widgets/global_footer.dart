@@ -3,6 +3,7 @@ import 'dart:ui' show ImageFilter;
 import 'package:streambeats/blocs/player_overlay/player_overlay_cubit.dart';
 import 'package:streambeats/screens/widgets/player_overlay_wrapper.dart';
 import 'package:streambeats/screens/widgets/mini_player_widget.dart';
+import 'package:streambeats/screens/widgets/morph_bar.dart';
 import 'package:streambeats/core/theme/app_theme.dart';
 import 'package:streambeats/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -14,15 +15,74 @@ import 'package:responsive_framework/responsive_framework.dart';
 
 import 'package:streambeats/screens/widgets/home_sidebar_drawer.dart';
 
-class GlobalFooter extends StatelessWidget {
+class GlobalFooter extends StatefulWidget {
   static final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   const GlobalFooter({super.key, required this.navigationShell});
   final StatefulNavigationShell navigationShell;
 
   @override
+  State<GlobalFooter> createState() => _GlobalFooterState();
+}
+
+class _GlobalFooterState extends State<GlobalFooter> {
+  /// true = MorphBar collapsed (pill Home + island). Digerakkan oleh scroll.
+  final ValueNotifier<bool> _collapsed = ValueNotifier<bool>(false);
+  double _scrollAcc = 0;
+
+  @override
+  void didUpdateWidget(covariant GlobalFooter oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Berpindah tab -> bar kembali melebar.
+    if (oldWidget.navigationShell.currentIndex !=
+        widget.navigationShell.currentIndex) {
+      _scrollAcc = 0;
+      _collapsed.value = false;
+    }
+  }
+
+  @override
+  void dispose() {
+    _collapsed.dispose();
+    super.dispose();
+  }
+
+  /// Scroll ke bawah -> collapse; scroll ke atas / dekat puncak -> expand.
+  /// Hanya menanggapi scroll vertikal utama (carousel horizontal diabaikan),
+  /// memakai akumulasi + histeresis agar tidak berkedip. Tidak pernah
+  /// mengonsumsi notifikasi sehingga scroll normal tidak terganggu.
+  bool _onScroll(ScrollNotification n) {
+    if (n.metrics.axis != Axis.vertical || n.depth > 2) return false;
+
+    if (n is ScrollUpdateNotification) {
+      final m = n.metrics;
+      final delta = n.scrollDelta ?? 0;
+
+      if (m.pixels <= 24) {
+        _scrollAcc = 0;
+        if (_collapsed.value) _collapsed.value = false;
+        return false;
+      }
+      if (m.outOfRange) return false; // pantulan overscroll: abaikan
+
+      if (delta * _scrollAcc < 0) _scrollAcc = 0; // arah berganti
+      _scrollAcc += delta;
+
+      if (_scrollAcc > 28 && !_collapsed.value) {
+        _collapsed.value = true;
+      } else if (_scrollAcc < -16 && _collapsed.value) {
+        _collapsed.value = false;
+      }
+    } else if (n is ScrollEndNotification) {
+      _scrollAcc = 0;
+    }
+    return false;
+  }
+
+  @override
   Widget build(BuildContext context) {
     context.watch<PlayerOverlayCubit>();
+    final navigationShell = widget.navigationShell;
     final isMobile = io.Platform.isAndroid ||
         io.Platform.isIOS ||
         ResponsiveBreakpoints.of(context).smallerOrEqualTo(TABLET);
@@ -53,50 +113,47 @@ class GlobalFooter extends StatelessWidget {
           canPop: false,
           onPopInvokedWithResult: (didPop, _) async {
             if (didPop) return;
-            await _handleHardwareBackPress(context);
+            await _handleHardwareBackPress(context, navigationShell);
           },
           child: Scaffold(
-            key: scaffoldKey,
+            key: GlobalFooter.scaffoldKey,
             backgroundColor: Default_Theme.themeColor,
             drawerScrimColor: Colors.black.withValues(alpha: 0.5),
             drawer: HomeSidebarDrawer(navigationShell: navigationShell),
-            body: isMobile
-                ? _AnimatedPageView(navigationShell: navigationShell)
-                : Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 4),
-                        child: VerticalNavBar(navigationShell: navigationShell),
-                      ),
-                      Expanded(
-                        child:
-                            _AnimatedPageView(navigationShell: navigationShell),
-                      ),
-                    ],
-                  ),
-            bottomNavigationBar: SafeArea(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const MiniPlayerWidget(),
-                  if (isMobile)
-                    Container(
-                      color: Colors.transparent,
-                      margin: const EdgeInsets.symmetric(
-                          vertical: 5, horizontal: 10),
-                      child: HorizontalNavBar(navigationShell: navigationShell),
+            // Mobile: konten meluncur di belakang kaca MorphBar.
+            extendBody: isMobile,
+            body: NotificationListener<ScrollNotification>(
+              onNotification: _onScroll,
+              child: isMobile
+                  ? _AnimatedPageView(navigationShell: navigationShell)
+                  : Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 4),
+                          child:
+                              VerticalNavBar(navigationShell: navigationShell),
+                        ),
+                        Expanded(
+                          child: _AnimatedPageView(
+                              navigationShell: navigationShell),
+                        ),
+                      ],
                     ),
-                ],
-              ),
             ),
+            bottomNavigationBar: isMobile
+                ? MorphBar(
+                    navigationShell: navigationShell,
+                    collapsed: _collapsed,
+                  )
+                : const SafeArea(child: MiniPlayerWidget()),
           ),
         ),
       ),
     );
   }
 
-  Future<void> _handleHardwareBackPress(BuildContext context) async {
+  Future<void> _handleHardwareBackPress(BuildContext context,
+      StatefulNavigationShell navigationShell) async {
     final overlayC = context.read<PlayerOverlayCubit>();
     final router = GoRouter.of(context);
 

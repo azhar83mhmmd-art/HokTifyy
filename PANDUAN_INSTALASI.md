@@ -77,17 +77,18 @@ termux-setup-storage          # izinkan akses penyimpanan
 
 Salin source ke Termux. Pilih salah satu:
 
-**A. Dari zip di HP** (mis. `Vynora Music-source.zip` ada di folder Download):
+**A. Dari zip di HP** (mis. `VynoraMusic-2.0.0.zip` ada di folder Download):
 ```bash
 cd ~
-unzip ~/storage/downloads/HokTifyy-source.zip
-cd Vynora Music
+unzip ~/storage/downloads/VynoraMusic-2.0.0.zip
+cd VynoraMusic-main
+
 ```
 
 **B. Dari repo yang sudah ada:**
 ```bash
 git clone https://github.com/USERNAME/HokTifyy
-cd Vynora Music
+cd VynoraMusic
 ```
 
 ---
@@ -137,10 +138,10 @@ atau buka tab **Releases** di repo dan unduh APK langsung dari browser:
 
 | File | Untuk |
 |---|---|
-| `Vynora Music-android-arm64-v8a.apk` | HP modern (hampir semua HP sejak ±2017) |
-| `Vynora Music-android-armeabi-v7a.apk` | HP 32-bit lama |
-| `Vynora Music-android-x86_64.apk` | Emulator / Chromebook |
-| `Vynora Music-android-universal.apk` | **Bingung? pilih ini** (lebih besar, cocok di semua) |
+| `VynoraMusic-android-arm64-v8a.apk` | HP modern (hampir semua HP sejak ±2017) |
+| `VynoraMusic-android-armeabi-v7a.apk` | HP 32-bit lama |
+| `VynoraMusic-android-x86_64.apk` | Emulator / Chromebook |
+| `VynoraMusic-android-universal.apk` | **Bingung? pilih ini** (lebih besar, cocok di semua) |
 
 ---
 
@@ -220,7 +221,7 @@ Pemutar musik dan playlist bersama berjalan **tanpa login Google** (lihat bagian
 - Repo **public** (aplikasi membaca GitHub tanpa login).
 - APK terpasang dibuild dari repo itu (build ini sudah membawa `HOKTIFYY_REPO` otomatis).
 - Build baru ditandatangani **keystore yang sama** (dibuat `setup.sh`), kalau tidak, installer menolak menimpa.
-- Release punya file `Vynora Music-android-universal.apk` (otomatis dibuat workflow).
+- Release punya file `VynoraMusic-android-universal.apk` (otomatis dibuat workflow).
 
 ### Merilis update
 ```bash

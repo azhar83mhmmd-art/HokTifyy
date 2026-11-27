@@ -398,7 +398,7 @@ class _LocalMusicScreenState extends State<LocalMusicScreen> {
           ),
         ),
       );
-      widgets.add(const SliverPadding(padding: EdgeInsets.only(bottom: 80)));
+      widgets.add(const SliverPadding(padding: EdgeInsets.only(bottom: 150)));
     }
 
     return widgets;

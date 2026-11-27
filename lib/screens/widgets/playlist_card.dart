@@ -1,3 +1,4 @@
+import 'package:streambeats/screens/widgets/tap_scale.dart';
 import 'package:streambeats/core/models/exported.dart';
 import 'package:streambeats/screens/screen/common_views/playlist_view.dart';
 import 'package:streambeats/core/theme/app_theme.dart';
@@ -34,7 +35,7 @@ class _PlaylistCardState extends State<PlaylistCard> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return TapScale(child: SizedBox(
       width: widget.cardWidth,
       child: GestureDetector(
         onTap: () {
@@ -67,7 +68,7 @@ class _PlaylistCardState extends State<PlaylistCard> {
           ),
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildThumbnail() {

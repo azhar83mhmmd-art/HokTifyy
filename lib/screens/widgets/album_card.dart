@@ -1,3 +1,4 @@
+import 'package:streambeats/screens/widgets/tap_scale.dart';
 import 'package:streambeats/core/models/exported.dart';
 import 'package:streambeats/screens/screen/common_views/album_view.dart';
 import 'package:streambeats/core/theme/app_theme.dart';
@@ -29,7 +30,7 @@ class _AlbumCardState extends State<AlbumCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return TapScale(child: Container(
       constraints: const BoxConstraints(maxWidth: 168),
       child: GestureDetector(
         onTap: () {
@@ -154,6 +155,6 @@ class _AlbumCardState extends State<AlbumCard> {
           ),
         ),
       ),
-    );
+    ));
   }
 }

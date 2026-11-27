@@ -198,7 +198,9 @@ class _LibraryScreenViewState extends State<_LibraryScreenView> {
                       ),
                     ),
                   ),
-                ],
+                
+SliverToBoxAdapter(child: SizedBox(height: MediaQuery.paddingOf(context).bottom + 16)),
+],
               );
             }
 
@@ -398,7 +400,9 @@ class _LibraryScreenViewState extends State<_LibraryScreenView> {
                         },
                       ),
                     ],
-                  ],
+                  
+SliverToBoxAdapter(child: SizedBox(height: MediaQuery.paddingOf(context).bottom + 16)),
+],
                 );
               },
             );

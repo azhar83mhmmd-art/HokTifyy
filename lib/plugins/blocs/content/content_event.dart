@@ -16,6 +16,18 @@ class SearchContent extends ContentEvent {
   });
 }
 
+/// Pemanasan hasil pencarian di latar belakang saat pengguna masih mengetik,
+/// sehingga menekan Enter / memilih saran terasa instan (hasil dari cache).
+class PrefetchSearchContent extends ContentEvent {
+  final String query;
+  final ContentSearchFilter filter;
+
+  const PrefetchSearchContent({
+    required this.query,
+    this.filter = ContentSearchFilter.all,
+  });
+}
+
 class LoadMoreSearchContent extends ContentEvent {
   final String pageToken;
 
