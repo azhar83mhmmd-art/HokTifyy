@@ -1,4 +1,7 @@
+import 'package:streambeats/core/widgets/stats_icon.dart';
 import 'package:streambeats/core/config/app_config.dart';
+import 'package:streambeats/core/constants/route_paths.dart';
+import 'package:streambeats/services/stats/stats_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -217,7 +220,21 @@ class HomeSidebarDrawer extends StatelessWidget {
                   avatarUrl = meta['avatar_url'];
                 }
 
-                return Padding(
+                // Profil Vynora (nama/foto yang diubah pengguna) menggantikan
+                // data bawaan akun bila tersedia.
+                final prof = StatsRepository.instance.myProfile.value;
+                if (user != null && prof != null) {
+                  displayName = prof.displayName;
+                  avatarUrl = prof.avatarUrl ?? avatarUrl;
+                  subtitle = 'View profile';
+                }
+
+                return InkWell(
+                  onTap: () {
+                    Navigator.pop(context);
+                    GoRouter.of(context).pushNamed(RoutePaths.profileScreen);
+                  },
+                  child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
                   child: Row(
                     children: [
@@ -264,6 +281,7 @@ class HomeSidebarDrawer extends StatelessWidget {
                       ),
                     ],
                   ),
+                  ),
                 );
               },
             ),
@@ -306,8 +324,8 @@ class HomeSidebarDrawer extends StatelessWidget {
                     },
                   ),
                   _buildDrawerItem(
-                    label: l10n.navLocal,
-                    icon: currentIdx == 3 ? MingCute.music_2_fill : MingCute.music_2_line,
+                    label: l10n.navStats,
+                    icon: currentIdx == 3 ? kStatsIconFilled : kStatsIcon,
                     isSelected: currentIdx == 3,
                     onTap: () {
                       Navigator.pop(context);
@@ -524,7 +542,7 @@ class HomeSidebarDrawer extends StatelessWidget {
         onTap: onTap,
         dense: true,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        leading: Icon(
+        leading: NavIcon(
           icon,
           color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.6),
           size: 20,

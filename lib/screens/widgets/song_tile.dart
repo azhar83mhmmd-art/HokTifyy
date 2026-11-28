@@ -1,3 +1,4 @@
+import 'package:streambeats/screens/widgets/radial_quick_menu.dart';
 import 'package:streambeats/core/widgets/hok_signature.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -125,16 +126,22 @@ class SongCardWidget extends StatelessWidget {
                         ),
                       ),
 
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(14),
-                      child: SizedBox(
-                        width: isWide ? 86 : 50,
-                        height: 50,
-                        child: LoadImageCached(
-                          imageUrl: song.thumbnail.urlLow ?? song.thumbnail.url,
-                          fallbackUrl:
-                              song.thumbnail.urlLow ?? song.thumbnail.url,
-                          fit: BoxFit.cover,
+                    // Tekan & tahan artwork -> Radial Quick Menu. Long-press di
+                    // area lain tetap membuka sheet "more" seperti sebelumnya.
+                    RadialMenuArtwork(
+                      track: song,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(14),
+                        child: SizedBox(
+                          width: isWide ? 86 : 50,
+                          height: 50,
+                          child: LoadImageCached(
+                            imageUrl:
+                                song.thumbnail.urlLow ?? song.thumbnail.url,
+                            fallbackUrl:
+                                song.thumbnail.urlLow ?? song.thumbnail.url,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                     ),

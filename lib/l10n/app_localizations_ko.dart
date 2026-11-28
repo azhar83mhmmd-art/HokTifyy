@@ -30,6 +30,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get navLocal => '로컬';
 
   @override
+  String get navStats => '통계';
+
+  @override
   String get navOffline => '오프라인';
 
   @override

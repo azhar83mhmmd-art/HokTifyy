@@ -1,3 +1,4 @@
+import 'package:streambeats/core/widgets/stats_icon.dart';
 import 'dart:math' as math;
 import 'dart:ui' as ui show ImageFilter, lerpDouble;
 
@@ -145,7 +146,7 @@ class _MorphBarState extends State<MorphBar> with TickerProviderStateMixin {
       (MingCute.home_4_line, MingCute.home_4_fill, l10n.navHome),
       (MingCute.book_5_line, MingCute.book_5_fill, l10n.navLibrary),
       (MingCute.search_2_line, MingCute.search_2_fill, l10n.navSearch),
-      (MingCute.music_2_line, MingCute.music_2_fill, l10n.navLocal),
+      (kStatsIcon, kStatsIconFilled, l10n.navStats),
       (MingCute.folder_download_line, MingCute.folder_download_fill,
           l10n.navOffline),
     ];
@@ -185,7 +186,7 @@ class _MorphBarState extends State<MorphBar> with TickerProviderStateMixin {
                       child: ClipPath(
                         clipper: _PathClipper(path),
                         child: BackdropFilter(
-                          filter: ui.ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+                          filter: ui.ImageFilter.blur(sigmaX: 28, sigmaY: 28),
                           child: CustomPaint(
                             painter:
                                 _GlassPainter(path: path, t: tc, tint: tint),
@@ -403,10 +404,24 @@ class _GlassPainter extends CustomPainter {
     final bounds = path.getBounds();
     if (bounds.isEmpty) return;
 
-    canvas.drawPath(path, Paint()..color = tint.withValues(alpha: 0.50));
+    // Isian: tint tipis + lapisan terang halus agar tetap terbaca sebagai kaca
+    // walau di belakangnya gelap.
+    canvas.drawPath(path, Paint()..color = tint.withValues(alpha: 0.34));
+    canvas.drawPath(
+        path, Paint()..color = Colors.white.withValues(alpha: 0.07));
 
     canvas.save();
     canvas.clipPath(path);
+
+    // Cahaya tepi bagian dalam (kesan ketebalan & refraksi di pinggir kaca).
+    canvas.drawPath(
+      path,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 7
+        ..color = Colors.white.withValues(alpha: 0.10)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5),
+    );
 
     // Cahaya lembut dari atas (bukan putih pekat) + redaman di dasar.
     canvas.drawRect(
@@ -416,9 +431,9 @@ class _GlassPainter extends CustomPainter {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Colors.white.withValues(alpha: 0.10),
+            Colors.white.withValues(alpha: 0.20),
             Colors.white.withValues(alpha: 0.0),
-            Colors.black.withValues(alpha: 0.10),
+            Colors.white.withValues(alpha: 0.05),
           ],
           stops: const [0.0, 0.55, 1.0],
         ).createShader(bounds),
@@ -439,7 +454,7 @@ class _GlassPainter extends CustomPainter {
         ..shader = LinearGradient(
           colors: [
             Colors.white.withValues(alpha: 0.0),
-            Colors.white.withValues(alpha: 0.09),
+            Colors.white.withValues(alpha: 0.16),
             Colors.white.withValues(alpha: 0.0),
           ],
         ).createShader(Rect.fromLTWH(cx - 20, bounds.top, 60, bounds.height)),
@@ -451,14 +466,14 @@ class _GlassPainter extends CustomPainter {
       path,
       Paint()
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.0
+        ..strokeWidth = 1.2
         ..shader = LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Colors.white.withValues(alpha: 0.30),
-            Colors.white.withValues(alpha: 0.05),
-            Colors.white.withValues(alpha: 0.12),
+            Colors.white.withValues(alpha: 0.50),
+            Colors.white.withValues(alpha: 0.10),
+            Colors.white.withValues(alpha: 0.28),
           ],
         ).createShader(bounds),
     );
@@ -514,7 +529,7 @@ class _NavGlyph extends StatelessWidget {
                   ),
                 ),
               ),
-              Icon(
+              NavIcon(
                 icon,
                 size: 22,
                 color: selected

@@ -30,6 +30,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get navLocal => 'Lokal';
 
   @override
+  String get navStats => 'Statistiken';
+
+  @override
   String get navOffline => 'Offline';
 
   @override

@@ -12,6 +12,8 @@ import 'package:streambeats/screens/screen/library_views/shared_playlist_screen.
 import 'package:streambeats/screens/screen/home_views/party_room_screen.dart';
 import 'package:streambeats/screens/screen/offline_screen.dart';
 import 'package:streambeats/screens/screen/local_music_screen.dart';
+import 'package:streambeats/screens/screen/stats/stats_screen.dart';
+import 'package:streambeats/screens/screen/stats/profile_screen.dart';
 import 'package:streambeats/screens/screen/search_screen.dart';
 import 'package:streambeats/screens/screen/chart/chart_view.dart';
 
@@ -27,6 +29,13 @@ class AppRouter {
         parentNavigatorKey: globalRouterKey,
         name: RoutePaths.addToPlaylistScreen,
         builder: (context, state) => const AddToPlaylistScreen(),
+      ),
+      GoRoute(
+        path: '/Profile',
+        parentNavigatorKey: globalRouterKey,
+        name: RoutePaths.profileScreen,
+        builder: (context, state) =>
+            ProfileScreen(userId: state.uri.queryParameters['userId']),
       ),
       StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) =>
@@ -57,6 +66,11 @@ class AppRouter {
                   path: '/Library',
                   builder: (context, state) => const LibraryScreen(),
                   routes: [
+                    GoRoute(
+                      name: RoutePaths.localMusicScreen,
+                      path: 'LocalMusic',
+                      builder: (context, state) => const LocalMusicScreen(),
+                    ),
                     GoRoute(
                       path: 'PartyRoom',
                       name: 'PartyRoom',
@@ -116,9 +130,9 @@ class AppRouter {
             ]),
             StatefulShellBranch(routes: [
               GoRoute(
-                name: RoutePaths.localMusicScreen,
-                path: '/LocalMusic',
-                builder: (context, state) => const LocalMusicScreen(),
+                name: RoutePaths.statsScreen,
+                path: '/Stats',
+                builder: (context, state) => const StatsScreen(),
               ),
             ]),
             StatefulShellBranch(routes: [

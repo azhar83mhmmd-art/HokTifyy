@@ -1,3 +1,4 @@
+import 'package:streambeats/core/widgets/stats_icon.dart';
 import 'dart:io' as io;
 import 'dart:ui' show ImageFilter;
 import 'package:streambeats/blocs/player_overlay/player_overlay_cubit.dart';
@@ -267,8 +268,8 @@ class VerticalNavBar extends StatelessWidget {
             icon: const Icon(MingCute.search_2_fill),
             label: Text(l10n.navSearch)),
         NavigationRailDestination(
-            icon: const Icon(MingCute.music_2_fill),
-            label: Text(l10n.navLocal)),
+            icon: const NavIcon(kStatsIconFilled),
+            label: Text(l10n.navStats)),
         NavigationRailDestination(
             icon: const Icon(MingCute.folder_download_fill),
             label: Text(l10n.navOffline)),
@@ -300,7 +301,7 @@ class HorizontalNavBar extends StatelessWidget {
       (MingCute.home_4_line, MingCute.home_4_fill, l10n.navHome),
       (MingCute.book_5_line, MingCute.book_5_fill, l10n.navLibrary),
       (MingCute.search_2_line, MingCute.search_2_fill, l10n.navSearch),
-      (MingCute.music_2_line, MingCute.music_2_fill, l10n.navLocal),
+      (kStatsIcon, kStatsIconFilled, l10n.navStats),
       (MingCute.folder_download_line, MingCute.folder_download_fill,
           l10n.navOffline),
     ];
@@ -382,7 +383,7 @@ class _NavItem extends StatelessWidget {
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Icon(
+            child: NavIcon(
               selected ? activeIcon : icon,
               size: 22,
               color: selected

@@ -152,6 +152,12 @@ abstract class AppLocalizations {
   /// **'Local'**
   String get navLocal;
 
+  /// Stats tab label.
+  ///
+  /// In en, this message translates to:
+  /// **'Stats'**
+  String get navStats;
+
   /// No description provided for @navOffline.
   ///
   /// In en, this message translates to:

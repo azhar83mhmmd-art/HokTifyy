@@ -1,3 +1,4 @@
+import 'package:streambeats/core/constants/route_paths.dart';
 import 'dart:developer';
 import 'package:streambeats/blocs/explore/cubit/explore_cubits.dart';
 import 'package:streambeats/blocs/internet_connectivity/cubit/connectivity_cubit.dart';
@@ -32,6 +33,9 @@ import '../widgets/horizontal_card_view.dart';
 import '../widgets/hok_mix_card.dart';
 import '../widgets/tab_list_widget.dart';
 import 'package:streambeats/screens/widgets/global_footer.dart';
+import 'package:streambeats/screens/widgets/stats/user_avatar.dart';
+import 'package:streambeats/services/stats/stats_models.dart';
+import 'package:streambeats/services/stats/stats_repository.dart';
 import 'package:streambeats/services/supabase_auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:streambeats/services/update_service.dart';
@@ -388,7 +392,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   ),
                 ),
               
-SliverToBoxAdapter(child: SizedBox(height: MediaQuery.paddingOf(context).bottom + 16)),
+SliverToBoxAdapter(child: SizedBox(height: 96)),
 ],
             ),
           ),
@@ -498,8 +502,15 @@ class CustomDiscoverBar extends StatelessWidget {
           ),
           const TimerIcon(),
           const NotificationIcon(),
-          const SizedBox(width: 6),
-          // Avatar → Sidebar Drawer
+          // Menu (drawer) dipindah ke tombol ini; avatar membuka profil.
+          IconButton(
+            tooltip: 'Menu',
+            onPressed: () =>
+                GlobalFooter.scaffoldKey.currentState?.openDrawer(),
+            icon: const Icon(Icons.menu_rounded, color: Colors.white),
+          ),
+          const SizedBox(width: 2),
+          // Avatar → Profil
           StreamBuilder<AuthState>(
             stream: SupabaseAuthService.authStateChanges,
             builder: (context, snapshot) {
@@ -513,27 +524,51 @@ class CustomDiscoverBar extends StatelessWidget {
                 initials = parts.take(2).map((e) => e[0].toUpperCase()).join();
                 if (initials.isEmpty) initials = 'U';
               }
+              // Muat profil (nama/foto/frame) sekali bila sudah login.
+              if (user != null) {
+                WidgetsBinding.instance.addPostFrameCallback(
+                    (_) => StatsRepository.instance.warmProfile());
+              } else if (StatsRepository.instance.myProfile.value != null) {
+                WidgetsBinding.instance.addPostFrameCallback(
+                    (_) => StatsRepository.instance.clearProfile());
+              }
               return GestureDetector(
-                onTap: () =>
-                    GlobalFooter.scaffoldKey.currentState?.openDrawer(),
-                child: Container(
-                  width: 44,
-                  height: 44,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Default_Theme.primaryContainerColor,
-                    border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.18), width: 1.5),
-                  ),
-                  child: Text(
-                    initials,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      color: Default_Theme.onPrimaryContainerColor,
-                    ),
-                  ),
+                onTap: () => context.pushNamed(RoutePaths.profileScreen),
+                child: ValueListenableBuilder<UserProfile?>(
+                  valueListenable: StatsRepository.instance.myProfile,
+                  builder: (context, prof, _) {
+                    if (prof != null && user != null) {
+                      return UserAvatar(
+                        name: prof.displayName,
+                        url: prof.avatarUrl,
+                        accent: prof.accentColor,
+                        frame: prof.frame,
+                        size: 44,
+                        borderColor: Colors.white.withValues(alpha: 0.18),
+                        borderWidth: 1.5,
+                      );
+                    }
+                    return Container(
+                      width: 44,
+                      height: 44,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Default_Theme.primaryContainerColor,
+                        border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.18),
+                            width: 1.5),
+                      ),
+                      child: Text(
+                        initials,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: Default_Theme.onPrimaryContainerColor,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               );
             },

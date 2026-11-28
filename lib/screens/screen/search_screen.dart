@@ -1117,7 +1117,7 @@ class _SuggestionsSliver extends StatelessWidget {
                     onSearch: onSearchWithFilter,
                   )),
             ],
-            const SizedBox(height: 150),
+            const SizedBox(height: 110),
           ];
 
           return SliverPadding(

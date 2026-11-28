@@ -19,6 +19,7 @@ import 'package:streambeats/services/player/player_error_handler.dart';
 import 'package:streambeats/services/player/queue_manager.dart';
 import 'package:streambeats/services/player/related_songs_manager.dart';
 import 'package:streambeats/services/player/recently_played_tracker.dart';
+import 'package:streambeats/services/stats/listening_tracker.dart';
 import 'package:streambeats/services/plugin/plugin_service.dart';
 import 'package:streambeats/services/meta_resolver/smart_track_replacement_service.dart';
 import 'package:streambeats/services/discord_service.dart';
@@ -39,6 +40,7 @@ class StreamBeatsMusicPlayer extends BaseAudioHandler
   late QueueManager _queueManager;
   late RelatedSongsManager _relatedSongsManager;
   late RecentlyPlayedTracker _recentlyPlayedTracker;
+  ListeningTracker? _listeningTracker;
   late MediaResolverService _resolver;
   late SmartTrackReplacementService _smartTrackReplacementService;
 
@@ -130,6 +132,9 @@ class StreamBeatsMusicPlayer extends BaseAudioHandler
   Track get currentTrackInfo => _currentTrack;
   List<Track> get queueTracks => List<Track>.unmodifiable(_queueManager.tracks);
   int get currentQueueIndex => _queueManager.currentIndex;
+
+  /// Paksa kirim sesi mendengarkan yang tertunda (dipakai halaman Stats).
+  Future<void> flushListeningStats() async => _listeningTracker?.flushNow();
   PluginService get pluginService => ServiceLocator.pluginService;
 
   StreamBeatsMusicPlayer() {
@@ -301,6 +306,12 @@ class StreamBeatsMusicPlayer extends BaseAudioHandler
         (items, {bool atLast = false}) => addQueueTracks(items, atLast: atLast);
 
     _recentlyPlayedTracker = RecentlyPlayedTracker(
+      engine,
+      () => _queueManager.currentTrack,
+    );
+
+    // Durasi mendengarkan untuk Stats leaderboard (lihat ListeningTracker).
+    _listeningTracker = ListeningTracker(
       engine,
       () => _queueManager.currentTrack,
     );
@@ -1059,6 +1070,7 @@ class StreamBeatsMusicPlayer extends BaseAudioHandler
     _queueManager.dispose();
     _relatedSongsManager.dispose();
     await _recentlyPlayedTracker.dispose();
+    await _listeningTracker?.dispose();
 
     DiscordService.clearPresence();
     try {

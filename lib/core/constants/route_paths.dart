@@ -16,4 +16,6 @@ class RoutePaths {
   static const String importProcess = "ImportProcess";
   static const String chartScreen = "ChartScreen";
   static const String localMusicScreen = "LocalMusic";
+  static const String statsScreen = "Stats";
+  static const String profileScreen = "Profile";
 }

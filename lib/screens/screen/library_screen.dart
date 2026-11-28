@@ -1,3 +1,4 @@
+import 'package:streambeats/screens/widgets/saved_albums_filmstrip.dart';
 import 'dart:ui';
 
 import 'package:streambeats/blocs/media_player/streambeats_player_cubit.dart';
@@ -199,7 +200,7 @@ class _LibraryScreenViewState extends State<_LibraryScreenView> {
                     ),
                   ),
                 
-SliverToBoxAdapter(child: SizedBox(height: MediaQuery.paddingOf(context).bottom + 16)),
+SliverToBoxAdapter(child: SizedBox(height: 96)),
 ],
               );
             }
@@ -226,6 +227,13 @@ SliverToBoxAdapter(child: SizedBox(height: MediaQuery.paddingOf(context).bottom 
                     if (_isSearching)
                       SliverToBoxAdapter(
                         child: _buildSearchBar(),
+                      ),
+                    if (!isSearching && !_isReordering)
+                      SliverToBoxAdapter(
+                        child: SavedAlbumsFilmstrip(storageKeys: [
+                          for (final p in filteredPlaylists)
+                            if (p.type == PlaylistType.album) p.storageKey
+                        ]),
                       ),
                     if (isLoading)
                       SliverToBoxAdapter(
@@ -401,7 +409,7 @@ SliverToBoxAdapter(child: SizedBox(height: MediaQuery.paddingOf(context).bottom 
                       ),
                     ],
                   
-SliverToBoxAdapter(child: SizedBox(height: MediaQuery.paddingOf(context).bottom + 16)),
+SliverToBoxAdapter(child: SizedBox(height: 96)),
 ],
                 );
               },

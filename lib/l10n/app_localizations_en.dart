@@ -30,6 +30,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navLocal => 'Local';
 
   @override
+  String get navStats => 'Stats';
+
+  @override
   String get navOffline => 'Offline';
 
   @override

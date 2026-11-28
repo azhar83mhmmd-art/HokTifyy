@@ -30,6 +30,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get navLocal => 'लोकल';
 
   @override
+  String get navStats => 'आँकड़े';
+
+  @override
   String get navOffline => 'ऑफ़लाइन';
 
   @override

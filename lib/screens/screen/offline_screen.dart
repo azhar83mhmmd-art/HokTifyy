@@ -147,7 +147,7 @@ class _OfflineScreenState extends State<OfflineScreen> {
                     ),
                   ),
               
-SliverToBoxAdapter(child: SizedBox(height: MediaQuery.paddingOf(context).bottom + 16)),
+SliverToBoxAdapter(child: SizedBox(height: 96)),
 ],
             );
           },

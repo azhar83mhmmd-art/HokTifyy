@@ -30,6 +30,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get navLocal => '本地';
 
   @override
+  String get navStats => '统计';
+
+  @override
   String get navOffline => '离线';
 
   @override

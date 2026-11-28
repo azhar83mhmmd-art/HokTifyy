@@ -1,3 +1,4 @@
+import 'package:streambeats/screens/widgets/radial_quick_menu.dart';
 import 'dart:async';
 import 'dart:ui' show FontFeature, ImageFilter;
 
@@ -463,12 +464,15 @@ class CoverImageVolSlider extends StatelessWidget {
                               ),
                             ],
                           ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(28),
-                            child: LoadImageCached(
-                              imageUrl: highResUrl,
-                              fallbackUrl: lowResUrl,
-                              fit: BoxFit.cover,
+                          child: RadialMenuArtwork(
+                            track: currentTrack,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(28),
+                              child: LoadImageCached(
+                                imageUrl: highResUrl,
+                                fallbackUrl: lowResUrl,
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
                         ),

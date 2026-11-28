@@ -1,3 +1,4 @@
+import 'package:streambeats/screens/widgets/radial_quick_menu.dart';
 import 'package:streambeats/core/widgets/hok_signature.dart';
 import 'dart:io';
 import 'package:streambeats/blocs/media_player/streambeats_player_cubit.dart';
@@ -9,6 +10,7 @@ import 'package:streambeats/screens/screen/common_views/album_view.dart';
 import 'package:streambeats/screens/screen/common_views/artist_view.dart';
 import 'package:streambeats/screens/screen/common_views/playlist_view.dart';
 import 'package:streambeats/screens/widgets/square_card.dart';
+import 'package:streambeats/screens/widgets/album_filmstrip.dart';
 import 'package:streambeats/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -94,8 +96,39 @@ class _HorizontalCardViewState extends State<HorizontalCardView> {
     }
   }
 
+  /// Section yang isinya album semua (>= 3) tampil sebagai Album Filmstrip.
+  List<AlbumSummary>? _albumsOnly() {
+    final items = widget.section.items;
+    if (items.length < 3) return null;
+    final out = <AlbumSummary>[];
+    for (final item in items) {
+      final a = item.when<AlbumSummary?>(
+        track: (_) => null,
+        album: (a) => a,
+        artist: (_) => null,
+        playlist: (_) => null,
+      );
+      if (a == null) return null;
+      out.add(a);
+    }
+    return out;
+  }
+
+  void _openAlbumFromFilmstrip(AlbumSummary album, String heroTag) {
+    final loadedPluginIds = context.read<PluginBloc>().state.loadedPluginIds;
+    if (!requirePlugin(widget.pluginId, loadedPluginIds)) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => AlbumView(
+            album: album, pluginId: widget.pluginId, heroTag: heroTag),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final albums = _albumsOnly();
     return Padding(
       padding: const EdgeInsets.only(top: 24),
       child: Column(
@@ -107,6 +140,16 @@ class _HorizontalCardViewState extends State<HorizontalCardView> {
             title: widget.section.title,
             onSeeAll: widget.canLoadMore ? widget.onLoadMore : null,
           ),
+          if (albums != null)
+            AlbumFilmstrip(
+              albums: albums,
+              onOpen: _openAlbumFromFilmstrip,
+              onNearEnd: widget.canLoadMore && !widget.isLoadingMore
+                  ? widget.onLoadMore
+                  : null,
+              isLoadingMore: widget.isLoadingMore,
+            )
+          else
           SizedBox(
             height: 190,
             child: Row(
@@ -212,13 +255,16 @@ class _HorizontalCardViewState extends State<HorizontalCardView> {
 
   Widget _buildCard(MediaItem item, {VoidCallback? onTap}) {
     return item.when(
-      track: (track) => SquareImgCard(
-        imgPath: track.thumbnail.url,
-        fallbackImgPath: track.thumbnail.urlLow ?? track.thumbnail.url,
-        title: track.title,
-        subtitle: track.artists.map((a) => a.name).join(', '),
-        isList: false,
-        onTap: onTap,
+      track: (track) => RadialMenuArtwork(
+        track: track,
+        child: SquareImgCard(
+          imgPath: track.thumbnail.url,
+          fallbackImgPath: track.thumbnail.urlLow ?? track.thumbnail.url,
+          title: track.title,
+          subtitle: track.artists.map((a) => a.name).join(', '),
+          isList: false,
+          onTap: onTap,
+        ),
       ),
       album: (album) => SquareImgCard(
         imgPath: album.thumbnail?.url ?? '',
